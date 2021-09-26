@@ -19,7 +19,12 @@ int Player::getWallsCounter() {
     return m_WallsCounter;
 }
 
+void Player::takeWall() {
+    --m_WallsCounter;
+}
+
 void Player::movePlayer(Directions direction) {
+    // TODO: add check if players are in front of each other
     switch (direction) {
     case left:
         --m_X;

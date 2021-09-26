@@ -33,8 +33,3 @@ bool Tile::getWall(unsigned char wall) {
         return false;
     }
 }
-
-void Tile::setWall(unsigned char wall) {
-    //wall &= lowMask;
-    m_Walls |= wall;
-}

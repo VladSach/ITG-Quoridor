@@ -20,6 +20,7 @@ public:
     int getWallsCounter();
 
     void movePlayer(Directions direction);
+    void takeWall();
 
 };
 

@@ -4,14 +4,22 @@
 #include "Tile.h"
 #include "Player.h"
 
+enum {
+    BoardSize = 9
+};
+
+enum PlayersChoice {
+    placeWall = 0,
+    changePosition
+};
+
 class Board {
 private:
-    Tile map[9][9]; 
-    // ??
-    // int map[9][9]
-    // unsigned char walls [9][9]
-    Player firstPlayer; 
-    Player secondPlayer;   
+    Tile map[BoardSize][BoardSize]; 
+
+    Player firstPlayer;
+    Player secondPlayer;
+    Player *currentPlayer;
 
 public:
     Board() : firstPlayer(4, 0), 
@@ -19,8 +27,8 @@ public:
     ~Board() = default;
 
     void initBoard();
+    void playerMove(Player *currentPlayer, PlayersChoice choice);
     
-
 };
 
 #endif // BOARD_H
