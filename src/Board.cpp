@@ -1,66 +1,25 @@
 #include "Board.h"
 
 void Board::initBoard() {
-    map = new char*[m_mapSize]{
-        "01010101010101010",
-        "11111111111111111",
-        "01010101010101010",
-        "01010101010101010",
-        "01010101010101010",
-        "01010101010101010",
-        "01010101010101010",
-        "01010101010101010",
-        "01010101010101010", 
-        "01010101010101010",
-        "01010101010101010",
-        "01010101010101010",
-        "01010101010101010",
-        "01010101010101010",
-        "01010101010101010",
-        "01010101010101010",
-        "01010101010101010",
-    };
-
-    // TODO: do this in a random way
-    currentPlayer = &firstPlayer;
-
-}
-void Board::setWall(unsigned char wall) {
-    // todo: add check for ability to place wall
-    // todo: add check if player has any walls
-    m_walls |= wall;
-}
-
-void Board::playerMove(Player *currentPlayer, PlayersChoice choice) {
-    switch (choice) {
-    case placeWall:
-        currentPlayer->takeWall();
-        break;
-
-    case changePosition:
-
-        break;
-    
-    default:
-        break;
+    // Initiates clear board
+    for (int i = 0; i < mapSize; i++) {
+        for (int j = 0; j < mapSize; j++) {
+            //map[i][j] = (j % 2 == 0) ? tile : empty;
+            if (i % 2 != 0) {
+                map[i][j] = empty;
+            } else if (j % 2 != 0) {
+                map[i][j] = empty;
+            } else {
+                map[i][j] = tile;
+            }
+        }
     }
 }
 
-// bool Tile::getWall(unsigned char wall) {
-//     switch (wall) {
-//     case leftWall:
-//         return (m_Walls & leftWall) ? true : false;
+int Board::getTile(const int x, const int y) {
+    return map[x][y];
+}
 
-//     case upperWall:
-//         return (m_Walls & upperWall) ? true : false;
-
-//     case lowerWall:
-//         return (m_Walls & lowerWall) ? true : false;
-
-//     case rightWall:
-//         return (m_Walls & rightWall) ? true : false;
-    
-//     default:
-//         return false;
-//     }
-// }
+void Board::placeWall(const int x, const int y) {
+    map[y][x] = wall;
+}

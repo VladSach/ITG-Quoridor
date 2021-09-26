@@ -1,7 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-enum Directions{
+enum PlayerDirection{
     left = 0, up, down, right
 };
 
@@ -10,17 +10,30 @@ private:
     int m_X;
     int m_Y;
 
+    // I guess restrict in 25 symbols is ok
+    const char *m_Name;
+    
+    // ? Give ability to decide Walls Amount before game started?
     int m_WallsCounter = 10;
 
 public:
-    Player(int x, int y, int wallsAmount = 10);
+    Player(int x, int y, const char *name);
     ~Player() = default;
 
-    int getPosition(int *x, int *y);
+    const char *getName();
     int getWallsCounter();
+    int getPosition(int *x, int *y);
 
-    void movePlayer(Directions direction);
     void takeWall();
+    void movePlayer(PlayerDirection direction);
+    
+    // rhs means "right hand side"
+    bool operator == (const Player& rhs) const {
+        return
+               this->m_X == rhs.m_X
+            && this->m_Y == rhs.m_Y
+            && this->m_Name == rhs.m_Name;
+    }
 
 };
 
