@@ -5,8 +5,8 @@ Game::Game() : firstPlayer(mapSize/2, mapSize-1, "John"),
 
     board.initBoard();
 
-    // Decides who acts first
     // ? Maybe do it random?
+    // Decides who acts first
     currentPlayer = &firstPlayer;
 }
 
@@ -14,6 +14,16 @@ void Game::switchCurrentPlayer() {
     (*currentPlayer == firstPlayer) ?
     currentPlayer = &secondPlayer :
     currentPlayer = &firstPlayer;
+}
+
+void Game::checkGameEnd() {
+    int x1, y1, x2, y2;
+    firstPlayer.getPosition(&x1, &y1);
+    secondPlayer.getPosition(&x2, &y2);
+
+    if (x1 == 0) winner = &firstPlayer;
+    else if (x2 == mapSize - 1) winner = &secondPlayer;
+    else winner = nullptr;
 }
 
 void Game::movePlayer(const int x, const int y) {
@@ -30,6 +40,8 @@ void Game::movePlayer(const int x, const int y) {
     else if (difX < 0) currentPlayer->movePlayer(left);
 
     switchCurrentPlayer();
+    checkGameEnd();
+    notifyUpdate();
 }
 
 void Game::placeWall(const int x, const int y, Direction direction) {
@@ -49,5 +61,20 @@ void Game::placeWall(const int x, const int y, Direction direction) {
     }
 
     currentPlayer->takeWall();
+
     switchCurrentPlayer();
+    checkGameEnd();
+    notifyUpdate();
+}
+
+Board Game::getBoard() {
+    return board;
+}
+
+void Game::getFirstPlayerPosition(int *x, int *y) {
+    firstPlayer.getPosition(x, y);
+}
+
+void Game::getSecondPlayerPosition(int *x, int *y) {
+    secondPlayer.getPosition(x, y);
 }

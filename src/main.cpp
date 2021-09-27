@@ -1,10 +1,13 @@
 #include "Game.h"
-
-#define watch(x) std::cout << #x << " is " << x << std::endl
+#include "View.h"
+#include "Controller.h"
 
 int main() {
     Game game;
-    game.playGame();
+    View view(&game);
+    Controller controller(&game);
+    controller.start();
+
     return 0;
 }
 
