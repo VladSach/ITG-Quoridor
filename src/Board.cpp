@@ -17,7 +17,7 @@ void Board::initBoard() {
 }
 
 int Board::getTile(const int x, const int y) {
-    return map[x][y];
+    return map[y][x];
 }
 
 void Board::placeWall(const int x, const int y) {

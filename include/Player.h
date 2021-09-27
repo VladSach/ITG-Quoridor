@@ -2,7 +2,9 @@
 #define PLAYER_H
 
 enum PlayerDirection{
-    left = 0, up, down, right
+    left = 0, up, down, right,
+    upper_left, upper_right,
+    lower_left, lower_right
 };
 
 class Player {
@@ -17,7 +19,7 @@ private:
     int m_WallsCounter = 10;
 
 public:
-    Player(int x, int y, const char *name);
+    Player(const int x, const int y, const char *name);
     ~Player() = default;
 
     const char *getName();
@@ -26,6 +28,8 @@ public:
 
     void takeWall();
     void movePlayer(PlayerDirection direction);
+    void doubleMove(PlayerDirection direction);
+    void diagonalMove(PlayerDirection direction);
     
     // rhs means "right hand side"
     bool operator == (const Player& rhs) const {
