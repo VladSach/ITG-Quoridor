@@ -43,8 +43,8 @@ void single(const char* firstName, const char* secondName) {
 }
 
 void multi(const char* firstName, const char* secondName) {
-    Player fp(mapSize/2, mapSize-1, firstName);
-    Player sp(mapSize/2, 0, secondName);
+    Player fp(6, 8, firstName);
+    Player sp(8, 8, secondName);
 
     Game game(fp, sp);
     View view(&game);

@@ -26,16 +26,18 @@ public:
     Game(IPlayer &fp, IPlayer &sp);
     ~Game() = default;
 
-    void makeTurn(const int x, const int y);
-    void calculatePossibleMoves();
 
     void initGame();
     bool checkGameEnd();
     void switchCurrentPlayer();
 
+    void calculatePossibleMoves();
+    void makeTurn(const int x, const int y);
     void movePlayer(const int x, const int y);
-    bool checkPlayersEncounter(const int x, const int y);
     void placeWall(const int x, const int y, Direction direction);
+
+    bool checkPlayersEncounter();
+    bool resolvePlayersEncounter(const int x, const int  y);
 
     void movePlayerErrorCheck(const int x, const int y);
     void placeWallErrorCheck(const int x, const int y, Direction direction);
@@ -47,8 +49,11 @@ public:
     std::vector<std::pair<int, int>> getPossibleMoves();
 
     bool getCurrentPlayerNeedsInput();
+
     void getFirstPlayerPosition(int *x, int *y);
     void getSecondPlayerPosition(int *x, int *y);
+    void getCurrentPlayerPosition(int *x, int *y);
+    void getOtherPlayerPosition(int *x, int *y);
 
     const char *getFirstPlayerName();
     const char *getSecondPlayerName();
