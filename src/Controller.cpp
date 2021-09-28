@@ -49,8 +49,7 @@ void Controller::start() {
             break;
             
         } catch(const std::exception& e) {
-            std::cerr << e.what() << '\n';
-            ////continue;
+            std::cerr << e.what() << "\n\n";
         }
     }
 

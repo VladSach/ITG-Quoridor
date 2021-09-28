@@ -1,6 +1,6 @@
 #include "Game.h"
 
-Game::Game() : firstPlayer(mapSize/2, 10, "John"),
+Game::Game() : firstPlayer(8, 4, "John"),
                secondPlayer(mapSize/2, 12, "Bot") {
 
     board.initBoard();
@@ -80,9 +80,10 @@ bool Game::checkPlayersEncounter(const int x, const int y){
     unsigned int difXAbs = (difX + maskX) ^ maskX;
     unsigned int difYAbs = (difY + maskY) ^ maskY;
 
+    // ! Fix bug when player goes back from other
     // Are player wants to overstep another
-    if (!(difX == 0 && difYAbs == 4) || 
-        !(difY == 0 && difXAbs == 4)) {
+    if (!((difX == 0 && difYAbs == 4) || 
+        (difY == 0 && difXAbs == 4))) {
             return false;
         }
 
@@ -107,11 +108,14 @@ void Game::placeWall(const int x, const int y, Direction direction) {
     case horizontal:
         board.placeWall(x, y);
         board.placeWall(x+1, y);
+        board.placeWall(x+2, y);
         break;
     
     case vertical:
         board.placeWall(x, y);
-        board.placeWall(x, y+1); 
+        board.placeWall(x, y+1);
+        board.placeWall(x, y+2); 
+        break;
 
     default:
         break;
@@ -160,12 +164,24 @@ void Game::movePlayerErrorCheck(const int x, const int y) {
         );
     }
 
+    // Tile is occupied
+    int x1, x2, y1, y2;
+    firstPlayer.getPosition(&x1, &y1);
+    secondPlayer.getPosition(&x2, &y2);
+
+    if ((x1 == x && y1 == y) ||
+        (x2 == x && y2 == y)) {
+            throw std::invalid_argument(
+                "It's already has someone on it"
+            );
+        }
+
     // Wall on the path
     int curX, curY;
     currentPlayer->getPosition(&curX, &curY);
     
-    int difX = x - curX;
-    int difY = curY - y;
+    const int difX = x - curX;
+    const int difY = curY - y;
 
     if (difY > 0) {
         if (board.getTile(curX, curY-1) == wall) {
@@ -198,18 +214,34 @@ void Game::movePlayerErrorCheck(const int x, const int y) {
 }
 
 void Game::placeWallErrorCheck(const int x, const int y, Direction direction) {
+    // Wall out of bounds
+    if (x > 17 || y > 17 || x < 0 || y < 0) {
+        throw std::invalid_argument(
+            "What's the point if you can't use it?"
+        );
+    }
+
+    // Block only one tile
+    if (x % 2 != 0 && y % 2 != 0) {
+        throw std::invalid_argument(
+            "You should always block two tiles"
+        );
+    }
+
     // Place wall on wall or wall on tile
     switch (direction) {
     case horizontal:
         if(board.getTile(x, y) == wall || 
-           board.getTile(x+1, y) == wall) { 
+           board.getTile(x+1, y) == wall ||
+           board.getTile(x+2, y) == wall) { 
                 throw std::invalid_argument(
                     "Hey, there's already a wall"
                 );
         }
 
         if (board.getTile(x, y) == tile ||
-            board.getTile(x+1, y) == tile) {
+            board.getTile(x+1, y) == tile ||
+            board.getTile(x+2, y) == tile) {
                 throw std::invalid_argument(
                     "You can't build a wall here, we walk on this"
                 );
@@ -219,14 +251,16 @@ void Game::placeWallErrorCheck(const int x, const int y, Direction direction) {
 
     case vertical:
         if(board.getTile(x, y) == wall || 
-           board.getTile(x, y+1) == wall) {
+           board.getTile(x, y+1) == wall ||
+           board.getTile(x, y+2) == wall) {
                 throw std::invalid_argument(
                     "Hey, there's already a wall"
                 );
         }
 
         if (board.getTile(x, y) == tile ||
-            board.getTile(x, y+1) == tile) {
+            board.getTile(x, y+1) == tile ||
+            board.getTile(x, y+2) == tile) {
                 throw std::invalid_argument(
                     "You can't build a wall here, we walk on this"
                 );
@@ -238,7 +272,6 @@ void Game::placeWallErrorCheck(const int x, const int y, Direction direction) {
         break;
     }
 
-    // TODO: Add last path blocked 
     // Player has no walls
     if (currentPlayer->getWallsCounter() == 0) {
         throw std::invalid_argument(
@@ -247,4 +280,142 @@ void Game::placeWallErrorCheck(const int x, const int y, Direction direction) {
     }
 
     // Closes last path to finish
+    Board boardCopy = getBoard();
+    if (!isPathExists(firstPlayer, 0, boardCopy, x, y, direction) ||
+        !isPathExists(secondPlayer, mapSize-1, boardCopy, x, y, direction)) {
+            throw std::invalid_argument(
+                "Did you really want to destroy his last hope?"
+            );
+    }
+}
+
+// BFS on grid
+bool Game::isPathExists(Player player, const int endCol, Board boardCopy, 
+                        const int x, const int y, Direction direction) {
+
+    switch (direction) {
+    case horizontal:
+        boardCopy.placeWall(x, y);
+        boardCopy.placeWall(x+1, y);
+        boardCopy.placeWall(x+2, y);
+        break;
+    
+    case vertical:
+        boardCopy.placeWall(x, y);
+        boardCopy.placeWall(x, y+1);
+        boardCopy.placeWall(x, y+2); 
+        break;
+
+    default:
+        break;
+    }
+    
+    // Row Queue and Column Queue
+    std::queue<int> rq, cq;
+
+    // Player position as starting node
+    int sr, sc;
+    player.getPosition(&sr, &sc);
+
+    // Variables used to track the number of steps taken.
+    int moveCount = 0;
+    int nodesLeftInLayer = 1;
+    int nodesInNextLayer = 0;
+
+    // Variable used to track whether the end ever gets reached
+    bool reachedEnd = false;
+
+    bool visited[mapSize][mapSize];
+    for (int i = 0; i < mapSize; i++)
+    {
+        for (int j = 0; j < mapSize; j++)
+        {
+            visited[i][j] = false;
+        }
+    }
+
+    // Define the direction vectors for
+    // north, south, east and west.
+    //   ↑      ↓     →        ←
+    int dr[4] = {-2, +2, 0, 0};
+    int dc[4] = {0, 0, +2, -2};
+
+    // Current position
+    int r = 0;
+    int c = 0;
+
+    rq.push(sr);
+    cq.push(sc);
+    visited[sr][sc] = true;
+
+    while (rq.size() > 0)
+    {
+        r = rq.front();
+        c = cq.front();
+        rq.pop();
+        cq.pop();
+
+        if (c == endCol) {
+            reachedEnd = true;
+            break;
+        }
+
+        int rr, cc;
+        for (int i = 0; i < 4; i++) {
+            rr = r + dr[i];
+            cc = c + dc[i];
+
+            // Skip out of bounds locations
+            if (rr < 0 || cc < 0)
+                continue;
+            if (rr >= mapSize || cc >= mapSize)
+                continue;
+
+            // Skip visited locations or walls
+            if (visited[rr][cc])
+                continue;
+            
+            int difX = r - rr;
+            int difY = cc - c;
+
+            if (difY > 0) {
+                if (boardCopy.getTile(rr, cc-1) == wall) {
+                    continue;
+                }
+            }
+            else if (difY < 0) {
+                if (boardCopy.getTile(rr, cc+1) == wall) {
+                    continue;
+                }
+            }
+            else if (difX > 0) {
+                if (boardCopy.getTile(rr+1, cc) == wall) {
+                    continue;
+                }
+            }
+            else if (difX < 0) {
+                if (boardCopy.getTile(rr-1, cc) == wall) {
+                    continue;
+                }
+            }
+            
+            rq.push(rr);
+            cq.push(cc);
+
+            visited[rr][cc] = true;
+            ++nodesInNextLayer;
+        }
+
+        --nodesLeftInLayer;
+        if (nodesLeftInLayer == 0)
+        {
+            nodesLeftInLayer = nodesInNextLayer;
+            nodesInNextLayer = 0;
+            ++moveCount;
+        }
+    }
+
+    if (reachedEnd) return true;
+
+    return false;
 }

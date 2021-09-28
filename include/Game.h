@@ -6,6 +6,8 @@
 #include "Observer.h"
 
 #include <iostream>
+
+#include <queue>
 #include <stdexcept>
 
 class Game : public Observable {
@@ -26,6 +28,8 @@ public:
     void movePlayer(const int x, const int y);
     bool checkPlayersEncounter(const int x, const int y);
     void placeWall(const int x, const int y, Direction direction);
+    bool isPathExists(Player player, const int endRow, Board boardCopy,
+                      const int x, const int y, Direction direction);
 
     void movePlayerErrorCheck(const int x, const int y);
     void placeWallErrorCheck(const int x, const int y, Direction direction);
