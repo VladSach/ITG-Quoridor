@@ -19,14 +19,13 @@ public:
     Bot() = default;
     ~Bot() = default;
 
-    const char *getName();
-    int getWallsCounter();
-    int getPosition(int *x, int *y);
+    const char *getName() const;
+    int getWallsCounter() const;
+    int getPosition(int *const x, int *const y) const;
 
     void takeWall();
-    void movePlayer(PlayerDirection direction);
-    void doubleMove(PlayerDirection direction);
-    void diagonalMove(PlayerDirection direction);
+    void move(std::vector<std::pair<int, int>> possibleMovements);
+    bool needsToTakeInput();
 };
 
 #endif // BOT_H

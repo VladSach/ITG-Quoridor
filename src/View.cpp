@@ -6,10 +6,15 @@ View::View(Game *model) {
 }
 
 void View::update() {
-    // TODO: Here goes the grahics
+    if (m_model->checkGameEnd() == true) {
+        std::cout << "Congrats " << m_model->getWinnerName() << std::endl;
+    } else {
+        std::cout << "Now is " << m_model->getCurrentPlayerName()
+                << "\'s move" << std::endl; 
+    }
+    std::cout << std::endl;
 
     drawMap(m_model->getBoard());
-
 }
 
 void View::drawMap(Board board) {
@@ -55,4 +60,14 @@ void View::drawMap(Board board) {
     }
     std::cout << std::endl;
 
+    std::vector<std::pair<int, int>> moves = m_model->getPossibleMoves();
+
+    std::cout << m_model->getCurrentPlayerName() << " Can move as this: ";
+    for(auto e : moves) {
+        std::cout << e.first << ' ' << e.second << ' ';
+        std::cout << '|' << ' ';
+    }
+
+    std::cout << std::endl;
+    std::cout << std::endl;
 }

@@ -5,19 +5,49 @@
 #include <ctime> // time()
 #include <cstdlib> // rand(), srand()
 
+void single(const char* firstName, const char* secondName);
+void multi(const char* firstName, const char* secondName);
+
 int main() {
     srand(time(0));
 
-    std::cout << "You want to play agains player or bot?" << std::endl;
+    bool playAgain = false;
 
-    Player fp(mapSize/2, mapSize-1, "John");
-    Player sp(mapSize/2, 0, "Bot");
+    do {
+        std::cout << "You want to play alone or with a friend? S/m" << std::endl;
+        char answer = 's';
+        std::cin >> answer;
+
+        if (answer == 's') single("Player", "Wally");
+        else multi("Player1", "Player2");
+
+        std::cout << "Want to play again? y/N" << std::endl;
+        std::cin >> answer;
+        if (answer == 'y') playAgain = true;
+        else playAgain = false;
+        std::cout << std::endl;
+
+    } while (playAgain);
+
+    return 0;
+}
+
+void single(const char* firstName, const char* secondName) {
+    Player fp(mapSize/2, mapSize-1, firstName);
+    Bot sp(mapSize/2, 0, secondName);
 
     Game game(fp, sp);
     View view(&game);
     Controller controller(&game);
     controller.start();
-
-    return 0;
 }
 
+void multi(const char* firstName, const char* secondName) {
+    Player fp(mapSize/2, mapSize-1, firstName);
+    Player sp(mapSize/2, 0, secondName);
+
+    Game game(fp, sp);
+    View view(&game);
+    Controller controller(&game);
+    controller.start();
+}

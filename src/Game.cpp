@@ -2,12 +2,16 @@
 
 Game::Game(IPlayer &fp, IPlayer &sp) : 
            firstPlayer(fp), secondPlayer(sp) {
+}
 
+void Game::initGame() {
     board.initBoard();
 
-    // ? Maybe do it random?
     // Decides who acts first
     currentPlayer = &firstPlayer;
+    calculatePossibleMoves();
+
+    notifyUpdate();
 }
 
 void Game::switchCurrentPlayer() {
@@ -33,72 +37,60 @@ bool Game::checkGameEnd() {
     }
 }
 
-void Game::movePlayer(const int x, const int y) {
-    movePlayerErrorCheck(x, y);
+void Game::makeTurn(const int x, const int y) {
 
-    if (checkPlayersEncounter(x, y)) return;
+    // * Build a wall
+    if (x % 2 != 0 || y % 2 != 0) {
+        if (x % 2 == 0 && y % 2 != 0) {
+            placeWall(x, y, horizontal);
+        } else if (x % 2 != 0 && y % 2 == 0) {
+            placeWall(x, y, vertical);
+        } else {} // * Skip move
 
-    int curX, curY;
-    currentPlayer->getPosition(&curX, &curY);
-    
-    const int difX = x - curX;
-    const int difY = curY - y;
-
-    if      (difY > 0) currentPlayer->movePlayer(up);
-    else if (difY < 0) currentPlayer->movePlayer(down);
-    else if (difX > 0) currentPlayer->movePlayer(right);
-    else if (difX < 0) currentPlayer->movePlayer(left);
+    } else { // * Move player
+        movePlayer(x, y);
+    }
 
     switchCurrentPlayer();
+    calculatePossibleMoves();
     checkGameEnd();
     notifyUpdate();
 }
 
-// * Checks if players in front of each other and solves it
-bool Game::checkPlayersEncounter(const int x, const int y){
-    // ! God, this is awful
-    int curX, curY, otherX, otherY;
+void Game::calculatePossibleMoves() {
+    int curX, curY;
     currentPlayer->getPosition(&curX, &curY);
-    switchCurrentPlayer();
-    currentPlayer->getPosition(&otherX, &otherY);
-    switchCurrentPlayer();
 
-    // P for players
-    const int difPX = curX - otherX;
-    const int difPY = curY - otherY;
-    
-    // Are players near each other
-    if (difPX > 2 || difPY > 2) return false;
+    possibleMoves.clear();
 
-    const int difX = x - curX;
-    const int difY = curY - y; 
-    
-    // * No need for cmath library and abs()
-    // * http://graphics.stanford.edu/~seander/bithacks.html#IntegerAbs
-    const int maskX = difX >> (sizeof(int) * __CHAR_BIT__ - 1);
-    const int maskY = difY >> (sizeof(int) * __CHAR_BIT__ - 1);
-    unsigned int difXAbs = (difX + maskX) ^ maskX;
-    unsigned int difYAbs = (difY + maskY) ^ maskY;
+    for(int x = curX - 2; x <= curX + 2; x+=2) {
+        for (int y = curY - 2; y <= curY + 2; y+=2) {
+            try {
+                movePlayerErrorCheck(x, y);
+            } catch(const std::exception& e) {
+                continue;
+            }
 
-    // ! Fix bug when player goes back from other
-    // Are player wants to overstep another
-    if (!((difX == 0 && difYAbs == 4) || 
-        (difY == 0 && difXAbs == 4))) {
-            return false;
+            possibleMoves.push_back(std::make_pair(x, y));
         }
+    }
 
-    // TODO: if there is a wall
+}
 
-    if      (difY > 0) currentPlayer->doubleMove(up);
-    else if (difY < 0) currentPlayer->doubleMove(down);
-    else if (difX > 0) currentPlayer->doubleMove(right);
-    else if (difX < 0) currentPlayer->doubleMove(left);
+void Game::movePlayer(const int x, const int y) {
+    std::vector<std::pair<int, int>> pM;
 
-    switchCurrentPlayer();
-    checkGameEnd();
-    notifyUpdate();
-            
-    return true;
+    if (currentPlayer->needsToTakeInput()) {
+        movePlayerErrorCheck(x, y);
+        for (auto e : possibleMoves) {
+            if (e.first == x && e.second == y) {
+                pM.push_back(std::make_pair(x, y));
+            }
+        }
+    } else pM = possibleMoves;
+
+    currentPlayer->move(pM);
+
 }
 
 void Game::placeWall(const int x, const int y, Direction direction) {
@@ -122,38 +114,6 @@ void Game::placeWall(const int x, const int y, Direction direction) {
     }
 
     currentPlayer->takeWall();
-
-    switchCurrentPlayer();
-    checkGameEnd();
-    notifyUpdate();
-}
-
-Board Game::getBoard() {
-    return board;
-}
-
-void Game::getFirstPlayerPosition(int *x, int *y) {
-    firstPlayer.getPosition(x, y);
-}
-
-void Game::getSecondPlayerPosition(int *x, int *y) {
-    secondPlayer.getPosition(x, y);
-}
-
-const char *Game::getFirstPlayerName() {
-    return firstPlayer.getName();
-}
-
-const char *Game::getSecondPlayerName() {
-    return secondPlayer.getName();
-}
-
-const char *Game::getCurrentPlayerName() {
-    return currentPlayer->getName();
-}
-
-const char *Game::getWinnerName() {
-    return winner->getName();
 }
 
 void Game::movePlayerErrorCheck(const int x, const int y) {
@@ -176,13 +136,34 @@ void Game::movePlayerErrorCheck(const int x, const int y) {
             );
         }
 
-    // Wall on the path
+    // Wrong movement
+    //if (checkPlayersEncounter(x, y)) continue;
     int curX, curY;
     currentPlayer->getPosition(&curX, &curY);
-    
+
     const int difX = x - curX;
     const int difY = curY - y;
 
+    // * No need for cmath library and abs()
+    // * http://graphics.stanford.edu/~seander/bithacks.html#IntegerAbs
+    const int maskX = difX >> (sizeof(int) * __CHAR_BIT__ - 1);
+    const int maskY = difY >> (sizeof(int) * __CHAR_BIT__ - 1);
+    unsigned int difXAbs = (difX + maskX) ^ maskX;
+    unsigned int difYAbs = (difY + maskY) ^ maskY;
+
+    if (difXAbs == 2 && difYAbs == 2) {
+        throw std::invalid_argument(
+            "You're not allowed to move diagonally ... most of the time"
+        );
+    }
+
+    if (difXAbs > 2 || difYAbs > 2) {
+        throw std::invalid_argument(
+            "OnE tIlE aT a TiMe"
+        );
+    }
+
+    // Wall on the path
     if (difY > 0) {
         if (board.getTile(curX, curY-1) == wall) {
             throw std::invalid_argument(
@@ -213,11 +194,66 @@ void Game::movePlayerErrorCheck(const int x, const int y) {
     }
 }
 
+// // * Checks if players in front of each other and solves it
+// bool Game::checkPlayersEncounter(const int x, const int y){
+//     // ! God, this is awful
+//     int curX, curY, otherX, otherY;
+//     currentPlayer->getPosition(&curX, &curY);
+//     switchCurrentPlayer();
+//     currentPlayer->getPosition(&otherX, &otherY);
+//     switchCurrentPlayer();
+
+//     // P for players
+//     const int difPX = curX - otherX;
+//     const int difPY = curY - otherY;
+    
+//     // Are players near each other
+//     if (difPX > 2 || difPY > 2) return false;
+
+//     const int difX = x - curX;
+//     const int difY = curY - y; 
+    
+//     // * No need for cmath library and abs()
+//     // * http://graphics.stanford.edu/~seander/bithacks.html#IntegerAbs
+//     const int maskX = difX >> (sizeof(int) * __CHAR_BIT__ - 1);
+//     const int maskY = difY >> (sizeof(int) * __CHAR_BIT__ - 1);
+//     unsigned int difXAbs = (difX + maskX) ^ maskX;
+//     unsigned int difYAbs = (difY + maskY) ^ maskY;
+
+//     // ! Fix bug when player goes back from other
+//     // Are player wants to overstep another
+//     if (!((difX == 0 && difYAbs == 4) || 
+//         (difY == 0 && difXAbs == 4))) {
+//             return false;
+//         }
+
+//     // TODO: if there is a wall
+
+//     if      (difY > 0) currentPlayer->doubleMove(up);
+//     else if (difY < 0) currentPlayer->doubleMove(down);
+//     else if (difX > 0) currentPlayer->doubleMove(right);
+//     else if (difX < 0) currentPlayer->doubleMove(left);
+
+//     switchCurrentPlayer();
+//     checkGameEnd();
+//     notifyUpdate();
+            
+//     return true;
+// }
+
 void Game::placeWallErrorCheck(const int x, const int y, Direction direction) {
     // Wall out of bounds
     if (x > 17 || y > 17 || x < 0 || y < 0) {
         throw std::invalid_argument(
             "What's the point if you can't use it?"
+        );
+    }
+
+    // Wall half out of bounds
+    if ((x > 14 && direction == horizontal ) ||
+        (y > 14 && direction == vertical)) {
+        throw std::invalid_argument(
+            "Look like a half measure to me (;¬_¬)"
         );
     }
 
@@ -284,7 +320,7 @@ void Game::placeWallErrorCheck(const int x, const int y, Direction direction) {
     if (!isPathExists(firstPlayer, 0, boardCopy, x, y, direction) ||
         !isPathExists(secondPlayer, mapSize-1, boardCopy, x, y, direction)) {
             throw std::invalid_argument(
-                "Did you really want to destroy his last hope?"
+                "What about healthy competition?"
             );
     }
 }
@@ -418,4 +454,40 @@ bool Game::isPathExists(IPlayer &player, const int endCol, Board boardCopy,
     if (reachedEnd) return true;
 
     return false;
+}
+
+Board Game::getBoard() {
+    return board;
+}
+
+std::vector<std::pair<int, int>> Game::getPossibleMoves() {
+    return possibleMoves;
+}
+
+bool Game::getCurrentPlayerNeedsInput() {
+    return currentPlayer->needsToTakeInput();
+}
+
+void Game::getFirstPlayerPosition(int *x, int *y) {
+    firstPlayer.getPosition(x, y);
+}
+
+void Game::getSecondPlayerPosition(int *x, int *y) {
+    secondPlayer.getPosition(x, y);
+}
+
+const char *Game::getFirstPlayerName() {
+    return firstPlayer.getName();
+}
+
+const char *Game::getSecondPlayerName() {
+    return secondPlayer.getName();
+}
+
+const char *Game::getCurrentPlayerName() {
+    return currentPlayer->getName();
+}
+
+const char *Game::getWinnerName() {
+    return winner->getName();
 }
