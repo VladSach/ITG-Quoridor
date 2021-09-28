@@ -4,15 +4,45 @@
 enum PlayerDirection{
     left = 0, up, down, right,
     upper_left, upper_right,
-    lower_left, lower_right
+    lower_left, lower_right,
+    last
 };
 
-class Player {
+class IPlayer {
+private:
+    int m_X;
+    int m_Y;
+    const char* m_Name;
+
+public:
+    virtual ~IPlayer() {};
+
+    virtual const char *getName() = 0;
+    virtual int getWallsCounter() = 0;
+    virtual int getPosition(int *x, int *y) = 0;
+
+    virtual void takeWall() = 0;
+    virtual void movePlayer(PlayerDirection) = 0;
+    virtual void doubleMove(PlayerDirection) = 0;
+    virtual void diagonalMove(PlayerDirection) = 0;
+
+    // rhs means "right hand side"
+    bool operator == (const IPlayer &rhs) const {
+        return
+               this->m_X == rhs.m_X
+            && this->m_Y == rhs.m_Y
+            && this->m_Name == rhs.m_Name;
+    }
+
+private:
+    IPlayer& operator=(const IPlayer&);
+};
+
+class Player : public IPlayer {
 private:
     int m_X;
     int m_Y;
 
-    // I guess restrict in 25 symbols is ok
     const char *m_Name;
     
     // ? Give ability to decide Walls Amount before game started?
@@ -20,6 +50,7 @@ private:
 
 public:
     Player(const int x, const int y, const char *name);
+    Player() = default;
     ~Player() = default;
 
     const char *getName();
@@ -30,15 +61,6 @@ public:
     void movePlayer(PlayerDirection direction);
     void doubleMove(PlayerDirection direction);
     void diagonalMove(PlayerDirection direction);
-    
-    // rhs means "right hand side"
-    bool operator == (const Player& rhs) const {
-        return
-               this->m_X == rhs.m_X
-            && this->m_Y == rhs.m_Y
-            && this->m_Name == rhs.m_Name;
-    }
-
 };
 
 #endif // PLAYER_H

@@ -7,6 +7,11 @@ Controller::Controller(Game *model) {
 void Controller::start() {
     // TODO: add input handling and main game loop
 
+    multiPlayer();
+    
+}
+
+void Controller::multiPlayer() {
     while (true) {
         try {
             if (m_model->checkGameEnd() == true) break;

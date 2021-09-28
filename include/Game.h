@@ -14,13 +14,13 @@ class Game : public Observable {
 private:
     Board board;
 
-    Player firstPlayer;
-    Player secondPlayer;
-    Player *currentPlayer = nullptr;
-    Player *winner = nullptr;
+    IPlayer &firstPlayer;
+    IPlayer &secondPlayer;
+    IPlayer *currentPlayer = nullptr;
+    IPlayer *winner = nullptr;
 
 public:
-    Game();
+    Game(IPlayer &fp, IPlayer &sp);
     ~Game() = default;
 
     bool checkGameEnd();
@@ -28,7 +28,7 @@ public:
     void movePlayer(const int x, const int y);
     bool checkPlayersEncounter(const int x, const int y);
     void placeWall(const int x, const int y, Direction direction);
-    bool isPathExists(Player player, const int endRow, Board boardCopy,
+    bool isPathExists(IPlayer &player, const int endRow, Board boardCopy,
                       const int x, const int y, Direction direction);
 
     void movePlayerErrorCheck(const int x, const int y);

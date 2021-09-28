@@ -1,32 +1,33 @@
-#include "Player.h"
+#include "Bot.h"
 
-Player::Player(const int x, const int y, const char* name) {
+Bot::Bot(const int x, const int y, const char* name) {
     m_X = x;
     m_Y = y;
     m_Name = name;
 }
 
-const char* Player::getName() {
+const char* Bot::getName() {
     return m_Name;
 }
 
 // @param x,y returning values
-int Player::getPosition(int *x, int *y) {
+int Bot::getPosition(int *x, int *y) {
     *x = m_X;
     *y = m_Y;
 
     return 0;
 }
 
-int Player::getWallsCounter() {
+int Bot::getWallsCounter() {
     return m_WallsCounter;
 }
 
-void Player::takeWall() {
+void Bot::takeWall() {
     --m_WallsCounter;
 }
 
-void Player::movePlayer(PlayerDirection direction) {
+void Bot::movePlayer(PlayerDirection direction =
+                    static_cast<PlayerDirection>(rand() % last)) {
     switch (direction) {
     case left:
         m_X -= 2;
@@ -50,7 +51,7 @@ void Player::movePlayer(PlayerDirection direction) {
 }
 
 
-void Player::doubleMove(PlayerDirection direction) {
+void Bot::doubleMove(PlayerDirection direction) {
     switch (direction) {
     case left:
         m_X -= 4;
@@ -72,7 +73,7 @@ void Player::doubleMove(PlayerDirection direction) {
     }
 }
 
-void Player::diagonalMove(PlayerDirection direction) {
+void Bot::diagonalMove(PlayerDirection direction) {
     switch (direction) {
     case upper_left:
         m_X -= 2;

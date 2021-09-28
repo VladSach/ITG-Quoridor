@@ -1,7 +1,7 @@
 #include "Game.h"
 
-Game::Game() : firstPlayer(8, 4, "John"),
-               secondPlayer(mapSize/2, 12, "Bot") {
+Game::Game(IPlayer &fp, IPlayer &sp) : 
+           firstPlayer(fp), secondPlayer(sp) {
 
     board.initBoard();
 
@@ -290,7 +290,7 @@ void Game::placeWallErrorCheck(const int x, const int y, Direction direction) {
 }
 
 // BFS on grid
-bool Game::isPathExists(Player player, const int endCol, Board boardCopy, 
+bool Game::isPathExists(IPlayer &player, const int endCol, Board boardCopy, 
                         const int x, const int y, Direction direction) {
 
     switch (direction) {

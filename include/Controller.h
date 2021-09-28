@@ -12,6 +12,8 @@ public:
     ~Controller() = default;
 
     void start();
+    void singlePlayer();
+    void multiPlayer();
 };
 
 #endif // CONTROLLER_H
