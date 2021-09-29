@@ -1,6 +1,6 @@
 CC = g++
 
-CFLAGS = -g -Wall
+CFLAGS = -g -Wall -lsfml-graphics -lsfml-window -slfml-system
 
 SOURCES = src/*.cpp
 
