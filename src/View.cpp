@@ -11,6 +11,9 @@ View::View(Game *model) {
     mTexture.loadFromFile("./media/map.png");
     mTexture.setSmooth(true);
     mSprite.setTexture(mTexture);
+    pTexture.loadFromFile("./media/players2.png");
+    pTexture.setSmooth(true);
+    pSprite.setTexture(pTexture);
 }
 
 void View::update() {
@@ -44,9 +47,12 @@ void View::update() {
 // }
 
 void View::drawMap(Board board) {
-    int x1, y1, x2, y2;
+    int x1, y1, x2, y2, x, y;
     m_model->getFirstPlayerPosition(&x1, &y1);  
     m_model->getSecondPlayerPosition(&x2, &y2);
+    m_model->getCurrentPlayerPosition(&x, &y);
+
+    std::vector<std::pair<int,int>> moves;
 
     // sf::String TileMap[] = 
 
@@ -59,31 +65,54 @@ void View::drawMap(Board board) {
             if (event.type == sf::Event::Closed){
                 window.close();
             }
-            if (event.type == sf::Event::MouseButtonReleased){}
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+                if (sf::IntRect(x, y, CELL_SIZE, CELL_SIZE).contains(sf::Mouse::getPosition(window))){
+                    moves = m_model->getPossibleMoves();
+                    std::cout << "That's ok" << std::endl;
+                    for (unsigned int i = 0; i < moves.size(); i++){
+                        mSprite.setTextureRect(sf::IntRect(100, 0, CELL_SIZE, CELL_SIZE));
+                        mSprite.setPosition(moves[i].first * CELL_SIZE, moves[i].second * CELL_SIZE);
+                        window.draw(mSprite);
+                    }
+                }
+            }
         }
 
         window.clear(sf::Color(0x80, 0x80, 0x0));
 
-        for(float i = 0; i < ARRAY_SIZE; i++){
-            for(float j = 0; j < ARRAY_SIZE; j++){
+        for(int i = 0; i < ARRAY_SIZE; i++){
+            for(int j = 0; j < ARRAY_SIZE; j++){
                 switch (board.getTile(i,j))
                 {
                 case 1:
-                    mSprite.setTextureRect(sf::IntRect(50, 0, 30, 30));
+                    mSprite.setTextureRect(sf::IntRect(50, 0, CELL_SIZE, CELL_SIZE));
                     break;
                 
                 case 0:
-                    mSprite.setTextureRect(sf::IntRect(0, 0, 30, 30));
+                    mSprite.setTextureRect(sf::IntRect(0, 0, CELL_SIZE, CELL_SIZE));
                     break;
                 }
-                // sf::RectangleShape shape1(sf::Vector2f(50, 50));
-                // shape1.setPosition({i * 70, j * 70});
-                // shape1.setFillColor(sf::Color(0x80, 0x0, 0x0));
-                // window.draw(shape1);
-                mSprite.setPosition(j * 30, i * 30);
+                mSprite.setPosition(j * CELL_SIZE, i * CELL_SIZE);
                 window.draw(mSprite);
             }
         }
+        pSprite.setTextureRect(sf::IntRect(0, 0, CELL_SIZE, CELL_SIZE));
+        pSprite.setPosition(x1 * CELL_SIZE, y1 * CELL_SIZE);
+        window.draw(pSprite);
+
+        pSprite.setTextureRect(sf::IntRect(30, 0, CELL_SIZE, CELL_SIZE));
+        pSprite.setPosition(x2 * CELL_SIZE, y2 * CELL_SIZE);
+        window.draw(pSprite);
+        // sf::RectangleShape player1(sf::Vector2i(30, 30));
+        // player1.setPosition({x1 * 30, y1 * 30});
+        // player1.setFillColor(sf::Color(0x80, 0x80, 0x0));
+        // window.draw(player1);
+
+        // sf::RectangleShape player2(sf::Vector2i(30, 30));
+        // player2.setPosition({x2 * 30, y2 * 30});
+        // player2.setFillColor(sf::Color(0x0, 0x0, 0xFF));
+        // window.draw(player2);
+
         window.display();
     }
 

@@ -8,15 +8,19 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 
 const int SIZE = 9;
-const int FIELD_SIZE = 530;
-const int CELL_SIZE = 50;
+const int FIELD_SIZE = 510;
+const int CELL_SIZE = 30;
 const int ARRAY_SIZE = 17;
 
 class View : public Observer {
 private:
     Game *m_model;
+
     sf::Texture mTexture;
     sf::Sprite mSprite;
+
+    sf::Texture pTexture;
+    sf::Sprite pSprite;
 
 public:
     View(Game *model);
