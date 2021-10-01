@@ -1,8 +1,29 @@
 #include "View.h"
+#include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
+#include <SFML/Window.hpp>
+
 
 View::View(Game *model) {
     m_model = model;
     m_model->addObserver(this);
+
+    m_window.create(sf::VideoMode({510, 510}), "Quoridor");
+
+    m_window.clear(sf::Color(0x80, 0x80, 0x0));
+
+    mTexture.loadFromFile("./media/map.png");
+    mTexture.setSmooth(true);
+    mSprite.setTexture(mTexture);
+
+    pTexture.loadFromFile("./media/players.png");
+    pTexture.setSmooth(true);
+    p1Sprite.setTexture(pTexture);
+    p2Sprite.setTexture(pTexture);
+
+    wTexture.loadFromFile("./media/walls.png");
+    wTexture.setSmooth(true);
+    wSprite.setTexture(wTexture);
 }
 
 void View::update() {
@@ -15,59 +36,73 @@ void View::update() {
     std::cout << std::endl;
 
     drawMap(m_model->getBoard());
+
+    m_window.display();
 }
 
 void View::drawMap(Board board) {
-    int x1, y1, x2, y2;
-    m_model->getFirstPlayerPosition(&x1, &y1);
+    int x1, y1, x2, y2, x, y;
+    m_model->getFirstPlayerPosition(&x1, &y1);  
     m_model->getSecondPlayerPosition(&x2, &y2);
+    m_model->getCurrentPlayerPosition(&x, &y);
 
-    std::cout << "    ";
-    for (int i = 0; i < mapSize; i++) {
-        if (i < 10)
-        std::cout << i << ' ';
-        else if (i >= 10) 
-        std::cout << i-10 << ' ';
-    }
-    std::cout << std::endl;
-    
-    std::cout << "    ";
-    for (int i = 0; i < mapSize; i++) {
-        std::cout << '-' << ' ';
-    }
-    std::cout << std::endl;
-
-    for (int i = 0; i < mapSize; i++) {
-        if (i < 10)
-        std::cout << i << ' ' << '|' << ' ';
-        else if (i >= 10) 
-        std::cout << i << '|' << ' ';
-
-            for (int j = 0; j < mapSize; j++) {
-                if (x1 == j && y1 == i) {
-                    std::cout << 'P' << ' ';
-                } else if (x2 == j && y2 == i) {
-                    std::cout << 'S' << ' ';
-                } else {
-                    int c = board.getTile(j, i);
-                    if (c == 0) std::cout << ' ';
-                    else if (c == 1) std::cout << '.';
-                    else if (c == 2) std::cout << '#';
-                    std::cout << ' ';
+    for(int i = 0; i < ARRAY_SIZE; i++){
+            for(int j = 0; j < ARRAY_SIZE; j++){
+                switch (board.getTile(i,j))
+                {
+                case wall:
+                    wSprite.setTextureRect(sf::IntRect(0, 0, CELL_SIZE, CELL_SIZE));
+                    wSprite.setPosition(i * CELL_SIZE, j * CELL_SIZE);
+                    m_window.draw(wSprite);
+                    break;
+                case tile:
+                    mSprite.setTextureRect(sf::IntRect(50, 0, CELL_SIZE, CELL_SIZE));
+                    mSprite.setPosition(i * CELL_SIZE, j * CELL_SIZE);
+                    m_window.draw(mSprite);
+                    break;
+                
+                case empty:
+                    mSprite.setTextureRect(sf::IntRect(0, 0, CELL_SIZE, CELL_SIZE));
+                    mSprite.setPosition(i * CELL_SIZE, j * CELL_SIZE);
+                    m_window.draw(mSprite);
+                    break;
                 }
-            }
-        std::cout << std::endl;
+
+            }   
+        }
+    p1Sprite.setTextureRect(sf::IntRect(0, 0, CELL_SIZE, CELL_SIZE));
+    p1Sprite.setPosition(x1 * CELL_SIZE, y1 * CELL_SIZE);
+    m_window.draw(p1Sprite);
+
+    p2Sprite.setTextureRect(sf::IntRect(30, 0, CELL_SIZE, CELL_SIZE));
+    p2Sprite.setPosition(x2 * CELL_SIZE, y2 * CELL_SIZE);
+    m_window.draw(p2Sprite);
+
+    
+}
+
+void View::drawPossibleMoves(){
+    moves = m_model->getPossibleMoves();                    
+    for (unsigned int i = 0; i < moves.size(); i++){
+        mSprite.setTextureRect(sf::IntRect(100, 0, CELL_SIZE, CELL_SIZE));
+        mSprite.setPosition(moves[i].first * CELL_SIZE, moves[i].second * CELL_SIZE);
+        m_window.draw(mSprite);
     }
-    std::cout << std::endl;
+    m_window.display();
+}
 
-    std::vector<std::pair<int, int>> moves = m_model->getPossibleMoves();
+sf::RenderWindow *View::getWindow(){
+    return &m_window;
+}
 
-    std::cout << m_model->getCurrentPlayerName() << " Can move as this: ";
-    for(auto e : moves) {
-        std::cout << e.first << ' ' << e.second << ' ';
-        std::cout << '|' << ' ';
-    }
+void View::drawHorizontalWall(sf::Vector2i pixelPos){
+    wSprite.setTextureRect(sf::IntRect(0, 0, CELL_SIZE, CELL_SIZE));
+    wSprite.setPosition((pixelPos.x / CELL_SIZE) * CELL_SIZE, (pixelPos.y / CELL_SIZE) * CELL_SIZE);
+    m_window.draw(wSprite);
+}
 
-    std::cout << std::endl;
-    std::cout << std::endl;
+void View::drawVerticalWall(sf::Vector2i pixelPos){
+    wSprite.setTextureRect(sf::IntRect(0, 0, CELL_SIZE, CELL_SIZE));
+    wSprite.setPosition((pixelPos.x / CELL_SIZE) * CELL_SIZE, (pixelPos.y / CELL_SIZE) * CELL_SIZE);
+    m_window.draw(wSprite);
 }
