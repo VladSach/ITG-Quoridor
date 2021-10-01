@@ -84,7 +84,6 @@ void View::drawMap(Board board) {
 void View::drawPossibleMoves(){
     moves = m_model->getPossibleMoves();                    
     for (unsigned int i = 0; i < moves.size(); i++){
-        std::cout << moves[i].first << " " << moves[i].second << std::endl;
         mSprite.setTextureRect(sf::IntRect(100, 0, CELL_SIZE, CELL_SIZE));
         mSprite.setPosition(moves[i].first * CELL_SIZE, moves[i].second * CELL_SIZE);
         m_window.draw(mSprite);
