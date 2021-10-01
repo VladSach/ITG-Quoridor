@@ -6,14 +6,12 @@ Controller::Controller(Game *model, View *view) {
     m_model = model;
     m_view = view;
     m_model->initGame();
-
-    
 }
 
 void Controller::start() {
     sf::Window *window = m_view->getWindow();
-    try {
-        while (window->isOpen()){
+    while (window->isOpen()){
+        try {
             if (m_model->checkGameEnd() == true) break;
             if (m_model->getCurrentPlayerNeedsInput()) {
                 int x, y;
@@ -38,13 +36,9 @@ void Controller::start() {
                         }
                     }
                 }
-            }else {
-                m_model->makeTurn(0, 0);
-            }
-        } 
-        
-    } catch(const std::exception& e) {
-        std::cerr << e.what() << "\n\n";
+            } else { m_model->makeTurn(0, 0); }
+        } catch (const std::exception& e) {
+            std::cerr << e.what() << "\n\n";
+        }
     }
-
 }

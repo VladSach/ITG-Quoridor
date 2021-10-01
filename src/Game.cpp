@@ -45,7 +45,9 @@ void Game::makeTurn(const int x, const int y) {
             placeWall(x, y, horizontal);
         } else if (x % 2 != 0 && y % 2 == 0) {
             placeWall(x, y, vertical);
-        } else {} // * Skip move
+        } else { // * Not allow current move
+            placeWallErrorCheck(x, y, horizontal);
+        }
 
     } else {
         movePlayer(x, y);
@@ -82,15 +84,21 @@ void Game::calculatePossibleMoves() {
 
 void Game::movePlayer(const int x, const int y) {
     std::vector<std::pair<int, int>> pM;
+    bool found = false;
 
     if (currentPlayer->needsToTakeInput()) {
-        movePlayerErrorCheck(x, y);
         for (auto e : possibleMoves) {
             if (e.first == x && e.second == y) {
-                pM.push_back(std::make_pair(x, y));
+                found = true;
             }
         }
     } else pM = possibleMoves;
+
+    if (found) {
+        pM.push_back(std::make_pair(x, y));
+    } else {
+        movePlayerErrorCheck(x, y);
+    }
 
     currentPlayer->move(pM);
 

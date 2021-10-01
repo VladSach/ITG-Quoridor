@@ -3,30 +3,22 @@
 
 #include "Game.h"
 #include "Observer.h"
-#include <SFML/Graphics/Texture.hpp>
-#include <SFML/Graphics/Sprite.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics.hpp>
 
-const int SIZE = 9;
-const int FIELD_SIZE = 510;
-const int CELL_SIZE = 30;
-const int ARRAY_SIZE = 17;
+const int CELL_SIZE = 30; // Board is 510x510
 
 class View : public Observer {
 private:
     Game *m_model;
 
-    sf::RenderWindow m_window;
+    sf::RenderWindow m_Window;
 
-    sf::Texture mTexture;
-    sf::Sprite mSprite;
+    sf::Texture boardTexture;
+    sf::Sprite boardSprite;
 
-    sf::Texture pTexture;
-    sf::Sprite p1Sprite;
-    sf::Sprite p2Sprite;
-
-    sf::Texture wTexture;
-    sf::Sprite wSprite;
+    sf::Texture playerTexture;
+    sf::Sprite player1Sprite;
+    sf::Sprite player2Sprite;
 
     std::vector<std::pair<int,int>> moves;
 public:
@@ -37,13 +29,8 @@ public:
 
     sf::RenderWindow *getWindow();
 
-    // ! Test function
-    // ! Don't use it
     void drawMap(Board board);
     void drawPossibleMoves();
-    void move(unsigned int i);
-    void drawHorizontalWall(sf::Vector2i pixelPos);
-    void drawVerticalWall(sf::Vector2i pixelPos);
 };
 
 #endif // VIEW_H
