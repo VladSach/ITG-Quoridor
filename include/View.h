@@ -35,13 +35,15 @@ public:
 
     virtual void update();
 
-    sf::RenderWindow getWindow();
+    sf::RenderWindow *getWindow();
 
     // ! Test function
     // ! Don't use it
     void drawMap(Board board);
     void drawPossibleMoves();
     void move(unsigned int i);
+    void drawHorizontalWall(sf::Vector2i pixelPos);
+    void drawVerticalWall(sf::Vector2i pixelPos);
 };
 
 #endif // VIEW_H
