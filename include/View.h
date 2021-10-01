@@ -16,13 +16,14 @@ class View : public Observer {
 private:
     Game *m_model;
 
+    sf::RenderWindow window;
+
     sf::Texture mTexture;
     sf::Sprite mSprite;
 
     sf::Texture pTexture;
     sf::Sprite p1Sprite;
     sf::Sprite p2Sprite;
-    sf::Sprite currentPlayerSprite;
 
     sf::Texture wTexture;
     sf::Sprite wSprite;

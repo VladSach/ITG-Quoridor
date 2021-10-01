@@ -8,7 +8,9 @@ View::View(Game *model) {
     m_model = model;
     m_model->addObserver(this);
 
-    sf::RenderWindow window(sf::VideoMode({510, 510}), "Quoridor");
+    window.create(sf::VideoMode({510, 510}), "Quoridor");
+
+    window.clear(sf::Color(0x80, 0x80, 0x0));
 
     mTexture.loadFromFile("./media/map.png");
     mTexture.setSmooth(true);
@@ -34,6 +36,8 @@ void View::update() {
     std::cout << std::endl;
 
     drawMap(m_model->getBoard());
+
+    window.display();
 }
 
 
@@ -61,10 +65,6 @@ void View::drawMap(Board board) {
     m_model->getCurrentPlayerPosition(&x, &y);
 
     std::vector<std::pair<int,int>> moves;
-
-    sf::RenderWindow window(sf::VideoMode({510, 510}), "Quoridor");
-
-    window.clear(sf::Color(0x80, 0x80, 0x0));
 
     for(int i = 0; i < ARRAY_SIZE; i++){
             for(int j = 0; j < ARRAY_SIZE; j++){
@@ -155,7 +155,6 @@ void View::drawMap(Board board) {
         // player2.setFillColor(sf::Color(0x0, 0x0, 0xFF));
         // window.draw(player2);
 
-        window.display();
     }
 
     // std::cout << "    ";
