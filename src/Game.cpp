@@ -30,7 +30,7 @@ bool Game::checkGameEnd() {
         return true;
     } else if (y2 == mapSize - 1) {
         winner = &secondPlayer;
-        return false;
+        return true;
     } else {
         winner = nullptr;
         return false;
