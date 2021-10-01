@@ -76,6 +76,15 @@ void View::drawMap(Board board) {
                     }
                 }
             }
+            if (event.type == sf::Event::KeyPressed){
+                moves = m_model->getPossibleMoves();
+                std::cout << "That's ok" << std::endl;
+                for (unsigned int i = 0; i < moves.size(); i++){
+                    mSprite.setTextureRect(sf::IntRect(100, 0, CELL_SIZE, CELL_SIZE));
+                    mSprite.setPosition(moves[i].first * CELL_SIZE, moves[i].second * CELL_SIZE);
+                    window.draw(mSprite);
+                }
+            }
         }
 
         window.clear(sf::Color(0x80, 0x80, 0x0));
