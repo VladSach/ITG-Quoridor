@@ -36,8 +36,6 @@ void View::update() {
     std::cout << std::endl;
 
     drawMap(m_model->getBoard());
-
-    m_window.display();
 }
 
 void View::drawMap(Board board) {
@@ -50,17 +48,21 @@ void View::drawMap(Board board) {
             for(int j = 0; j < ARRAY_SIZE; j++){
                 switch (board.getTile(i,j))
                 {
-                case 2:
+                case wall:
                     wSprite.setTextureRect(sf::IntRect(0, 0, CELL_SIZE, CELL_SIZE));
                     wSprite.setPosition(i * CELL_SIZE, j * CELL_SIZE);
                     m_window.draw(wSprite);
                     break;
-                case 1:
+                case tile:
                     mSprite.setTextureRect(sf::IntRect(50, 0, CELL_SIZE, CELL_SIZE));
+                    mSprite.setPosition(i * CELL_SIZE, j * CELL_SIZE);
+                    m_window.draw(mSprite);
                     break;
                 
-                case 0:
+                case empty:
                     mSprite.setTextureRect(sf::IntRect(0, 0, CELL_SIZE, CELL_SIZE));
+                    mSprite.setPosition(i * CELL_SIZE, j * CELL_SIZE);
+                    m_window.draw(mSprite);
                     break;
                 }
                 mSprite.setPosition(j * CELL_SIZE, i * CELL_SIZE);
@@ -74,6 +76,8 @@ void View::drawMap(Board board) {
     p2Sprite.setTextureRect(sf::IntRect(30, 0, CELL_SIZE, CELL_SIZE));
     p2Sprite.setPosition(x2 * CELL_SIZE, y2 * CELL_SIZE);
     m_window.draw(p2Sprite);
+
+    m_window.display();
 
     // while (window.isOpen()){
 
@@ -132,23 +136,11 @@ void View::drawMap(Board board) {
 void View::drawPossibleMoves(){
     moves = m_model->getPossibleMoves();                    
     for (unsigned int i = 0; i < moves.size(); i++){
-        std::cout << moves[i].first << " " << moves[i].second << std::endl;
         mSprite.setTextureRect(sf::IntRect(100, 0, CELL_SIZE, CELL_SIZE));
         mSprite.setPosition(moves[i].first * CELL_SIZE, moves[i].second * CELL_SIZE);
         m_window.draw(mSprite);
     }
-}
-
-void View::move(unsigned int i){
-    moves = m_model->getPossibleMoves();    
-    p1Sprite.move(sf::Vector2f(moves[i].first * CELL_SIZE - p1Sprite.getPosition().x , moves[i].second * CELL_SIZE - p1Sprite.getPosition().y));
-    m_window.draw(p1Sprite);
-    for (unsigned int j = 0; j < moves.size(); j++){
-        mSprite.setTextureRect(sf::IntRect(50, 0, CELL_SIZE, CELL_SIZE));
-        mSprite.setPosition(moves[j].first * CELL_SIZE, moves[j].second * CELL_SIZE);
-        m_window.draw(mSprite);
-    }
-    moves.clear();
+    m_window.display();
 }
 
 sf::RenderWindow *View::getWindow(){
@@ -159,10 +151,12 @@ void View::drawHorizontalWall(sf::Vector2i pixelPos){
     wSprite.setTextureRect(sf::IntRect(0, 0, CELL_SIZE, CELL_SIZE));
     wSprite.setPosition((pixelPos.x / CELL_SIZE) * CELL_SIZE, (pixelPos.y / CELL_SIZE) * CELL_SIZE);
     m_window.draw(wSprite);
+    m_window.display();
 }
 
 void View::drawVerticalWall(sf::Vector2i pixelPos){
     wSprite.setTextureRect(sf::IntRect(0, 0, CELL_SIZE, CELL_SIZE));
     wSprite.setPosition((pixelPos.x / CELL_SIZE) * CELL_SIZE, (pixelPos.y / CELL_SIZE) * CELL_SIZE);
     m_window.draw(wSprite);
+    m_window.display();
 }
