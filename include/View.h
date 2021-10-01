@@ -20,7 +20,9 @@ private:
     sf::Sprite mSprite;
 
     sf::Texture pTexture;
-    sf::Sprite pSprite;
+    sf::Sprite p1Sprite;
+    sf::Sprite p2Sprite;
+    sf::Sprite currentPlayerSprite;
 
 public:
     View(Game *model);
