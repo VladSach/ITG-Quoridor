@@ -24,6 +24,8 @@ private:
     sf::Sprite p2Sprite;
     sf::Sprite currentPlayerSprite;
 
+    sf::Texture wTexture;
+    sf::Sprite wSprite;
 public:
     View(Game *model);
     ~View() = default;

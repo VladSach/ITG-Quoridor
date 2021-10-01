@@ -8,13 +8,20 @@ View::View(Game *model) {
     m_model = model;
     m_model->addObserver(this);
 
+    sf::RenderWindow window(sf::VideoMode({510, 510}), "Quoridor");
+
     mTexture.loadFromFile("./media/map.png");
     mTexture.setSmooth(true);
     mSprite.setTexture(mTexture);
+
     pTexture.loadFromFile("./media/players2.png");
     pTexture.setSmooth(true);
     p1Sprite.setTexture(pTexture);
     p2Sprite.setTexture(pTexture);
+
+    wTexture.loadFromFile("./media/walls.png");
+    wTexture.setSmooth(true);
+    wSprite.setTexture(wTexture);
 }
 
 void View::update() {
@@ -86,7 +93,7 @@ void View::drawMap(Board board) {
     while (window.isOpen()){
 
         sf::Vector2i pixelPos = sf::Mouse::getPosition(window);
-		sf::Vector2f pos = window.mapPixelToCoords(pixelPos);
+		// sf::Vector2f pos = window.mapPixelToCoords(pixelPos);
 
         sf::Event event;
         while (window.pollEvent(event)){
@@ -94,7 +101,7 @@ void View::drawMap(Board board) {
                 window.close();
             }
             if (event.type == sf::Event::MouseButtonPressed){
-                if (sf::IntRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE).contains(pos.x, pos.y)){
+                if (sf::IntRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE).contains(pixelPos.x, pixelPos.y)){
                     moves = m_model->getPossibleMoves();                    
                     // if (currentPlayerSprite == p1Sprite){
                     //     currentPlayerSprite = p2Sprite;
@@ -106,9 +113,10 @@ void View::drawMap(Board board) {
                     }
                 }
                 for (unsigned int i = 0; i < moves.size(); i++){
-                    if (sf::IntRect(moves[i].first * CELL_SIZE, moves[i].second * CELL_SIZE, CELL_SIZE, CELL_SIZE).contains(pos.x, pos.y)){
+                    if (sf::IntRect(moves[i].first * CELL_SIZE, moves[i].second * CELL_SIZE, CELL_SIZE, CELL_SIZE).contains(pixelPos.x, pixelPos.y)){
                         p1Sprite.move(sf::Vector2f(moves[i].first * CELL_SIZE - p1Sprite.getPosition().x , moves[i].second * CELL_SIZE - p1Sprite.getPosition().y));
                         window.draw(p1Sprite);
+                        m_model->makeTurn(moves[i].first, moves[i].second);
                         for (unsigned int j = 0; j < moves.size(); j++){
                             mSprite.setTextureRect(sf::IntRect(50, 0, CELL_SIZE, CELL_SIZE));
                             mSprite.setPosition(moves[j].first * CELL_SIZE, moves[j].second * CELL_SIZE);
@@ -117,6 +125,22 @@ void View::drawMap(Board board) {
                         moves.clear();
                     }
                 
+                }
+                try{
+                    m_model->placeWall(pixelPos.x / CELL_SIZE, pixelPos.y / CELL_SIZE, horizontal);
+                    wSprite.setTextureRect(sf::IntRect(0, 0, 90, CELL_SIZE));
+                    wSprite.setPosition((pixelPos.x / CELL_SIZE) * CELL_SIZE, (pixelPos.y / CELL_SIZE) * CELL_SIZE);
+                    window.draw(wSprite);
+                } catch(const std::invalid_argument & e){
+                    std::cout << e.what() << std::endl;
+                }
+                try{
+                    m_model->placeWall(pixelPos.x / CELL_SIZE, pixelPos.y / CELL_SIZE, vertical);
+                    wSprite.setTextureRect(sf::IntRect(90, 0, CELL_SIZE, 90));
+                    wSprite.setPosition((pixelPos.x / CELL_SIZE) * CELL_SIZE, (pixelPos.y / CELL_SIZE) * CELL_SIZE);
+                    window.draw(wSprite);
+                } catch(const std::invalid_argument & e){
+                    std::cout << e.what() << std::endl;
                 }
             }
         }
