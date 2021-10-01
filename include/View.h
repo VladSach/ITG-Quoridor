@@ -16,7 +16,7 @@ class View : public Observer {
 private:
     Game *m_model;
 
-    sf::RenderWindow window;
+    sf::RenderWindow m_window;
 
     sf::Texture mTexture;
     sf::Sprite mSprite;
@@ -27,15 +27,21 @@ private:
 
     sf::Texture wTexture;
     sf::Sprite wSprite;
+
+    std::vector<std::pair<int,int>> moves;
 public:
     View(Game *model);
     ~View() = default;
 
     virtual void update();
 
+    sf::RenderWindow getWindow();
+
     // ! Test function
     // ! Don't use it
     void drawMap(Board board);
+    void drawPossibleMoves();
+    void move(unsigned int i);
 };
 
 #endif // VIEW_H

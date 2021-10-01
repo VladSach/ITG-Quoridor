@@ -38,7 +38,7 @@ void single(const char* firstName, const char* secondName) {
 
     Game game(fp, sp);
     View view(&game);
-    Controller controller(&game);
+    Controller controller(&game, &view);
     controller.start();
 }
 
@@ -48,6 +48,6 @@ void multi(const char* firstName, const char* secondName) {
 
     Game game(fp, sp);
     View view(&game);
-    Controller controller(&game);
+    Controller controller(&game, &view);
     controller.start();
 }
