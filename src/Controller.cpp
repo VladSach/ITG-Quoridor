@@ -43,20 +43,6 @@ void Controller::start() {
                                     m_model->makeTurn(m_model->getPossibleMoves()[i].first, m_model->getPossibleMoves()[i].second);
                                 }
                             }
-                            
-
-                            // try{
-                            //     m_model->placeWall(pixelPos.x / CELL_SIZE, pixelPos.y / CELL_SIZE, horizontal);
-                            //     m_view->drawHorizontalWall(pixelPos);
-                            // } catch(const std::invalid_argument & e){
-                            //     std::cout << e.what() << std::endl;
-                            // }
-                            // try{
-                            //     m_model->placeWall(pixelPos.x / CELL_SIZE, pixelPos.y / CELL_SIZE, vertical);
-                            //     m_view->drawVerticalWall(pixelPos);
-                            // } catch(const std::invalid_argument & e){
-                            //     std::cout << e.what() << std::endl;
-                            // }
                         }
                     }
                 }
