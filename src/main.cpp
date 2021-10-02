@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "View.h"
 #include "Controller.h"
+#include "Launcher.h"
 
 #include <ctime> // time()
 #include <cstdlib> // rand(), srand()
@@ -14,18 +15,24 @@ int main() {
     bool playAgain = false;
 
     do {
-        std::cout << "You want to play alone or with a friend? S/m" << std::endl;
-        char answer = 's';
-        std::cin >> answer;
+        Launcher launcher(&playAgain);
+
+        char answer = launcher.menu();
+        // std::cout << "You want to play alone or with a friend? S/m" << std::endl;
+        // char answer = 's';
+        // std::cin >> answer;
 
         if (answer == 's') single("Player", "Wally");
-        else multi("Player1", "Player2");
+        else if (answer == 'm') multi("Player1", "Player2");
+        else if (answer == 'e') playAgain = false;
+        
+        answer = launcher.oneMore(); 
 
-        std::cout << "Want to play again? y/N" << std::endl;
-        std::cin >> answer;
+        // std::cout << "Want to play again? y/N" << std::endl;
+        // std::cin >> answer;
         if (answer == 'y') playAgain = true;
         else playAgain = false;
-        std::cout << std::endl;
+        // std::cout << std::endl;
 
     } while (playAgain);
 
