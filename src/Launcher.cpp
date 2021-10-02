@@ -100,9 +100,9 @@ char Launcher::oneMore(){
 	sf::RenderWindow window(sf::VideoMode({510, 510}), "Quoridor");
    	window.clear(sf::Color(0x80, 0x80, 0x0));
 
-	again.setPosition(100, 160);
-	yes.setPosition(130, 220);
-	no.setPosition(200, 220);
+	again.setPosition(185, 160);
+	yes.setPosition(195, 220);
+	no.setPosition(275, 220);
 
 	again.setColor(sf::Color(0x80, 0x80, 0x0));
 	
@@ -112,8 +112,8 @@ char Launcher::oneMore(){
 		no.setColor(sf::Color(0x80, 0x80, 0x0));
 		menuNum = 0;
  
-		if (sf::IntRect(130, 220, 39, 30).contains(sf::Mouse::getPosition(window))) { yes.setColor(sf::Color::Red); menuNum = 1; }
-		if (sf::IntRect(200, 220, 50, 30).contains(sf::Mouse::getPosition(window))) { no.setColor(sf::Color::Red); menuNum = 2; }
+		if (sf::IntRect(195, 220, 39, 30).contains(sf::Mouse::getPosition(window))) { yes.setColor(sf::Color::Red); menuNum = 1; }
+		if (sf::IntRect(275, 220, 50, 30).contains(sf::Mouse::getPosition(window))) { no.setColor(sf::Color::Red); menuNum = 2; }
  
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{
