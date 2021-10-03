@@ -5,7 +5,8 @@
 #include "Observer.h"
 #include <SFML/Graphics.hpp>
 
-const int CELL_SIZE = 30; // Board is 510x510
+const int CELL_SIZE = 30; // Board is 730x510
+const int border = 110;
 
 class View : public Observer {
 private:
@@ -19,6 +20,10 @@ private:
     sf::Texture playerTexture;
     sf::Sprite player1Sprite;
     sf::Sprite player2Sprite;
+
+    sf::Font font;
+    sf::Text player1;
+    sf::Text player2;
 
     std::vector<std::pair<int,int>> moves;
 public:

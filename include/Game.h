@@ -55,6 +55,9 @@ public:
     void getCurrentPlayerPosition(int *x, int *y);
     void getOtherPlayerPosition(int *x, int *y);
 
+    int getFirstPlayerWalls();
+    int getSecondPlayerWalls();
+
     const char *getFirstPlayerName();
     const char *getSecondPlayerName();
     const char *getCurrentPlayerName();

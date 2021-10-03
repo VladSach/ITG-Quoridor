@@ -24,14 +24,14 @@ void Controller::start() {
                         window->close();
                     }
                     if (event.type == sf::Event::MouseButtonPressed){
-                        if (sf::IntRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE).contains(pixelPos.x, pixelPos.y)){
+                        if (sf::IntRect(x * CELL_SIZE + border, y * CELL_SIZE, CELL_SIZE, CELL_SIZE).contains(pixelPos.x, pixelPos.y)){
                             m_view->drawPossibleMoves();
                         } else{
-                            m_model->makeTurn(pixelPos.x / CELL_SIZE, pixelPos.y / CELL_SIZE);
+                            m_model->makeTurn((pixelPos.x - border)/ CELL_SIZE, pixelPos.y / CELL_SIZE);
                         }
                         for (unsigned int i = 0; i < m_model->getPossibleMoves().size(); i++){
-                            if (sf::IntRect(m_model->getPossibleMoves()[i].first * CELL_SIZE, m_model->getPossibleMoves()[i].second * CELL_SIZE, CELL_SIZE, CELL_SIZE).contains(pixelPos.x, pixelPos.y)){
-                                m_model->makeTurn(m_model->getPossibleMoves()[i].first, m_model->getPossibleMoves()[i].second);
+                            if (sf::IntRect(m_model->getPossibleMoves()[i].first - border * CELL_SIZE, m_model->getPossibleMoves()[i].second * CELL_SIZE, CELL_SIZE, CELL_SIZE).contains(pixelPos.x, pixelPos.y)){
+                                m_model->makeTurn(m_model->getPossibleMoves()[i].first - border, m_model->getPossibleMoves()[i].second);
                             }
                         }
                     }
