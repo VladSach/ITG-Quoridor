@@ -1,6 +1,6 @@
 #include "View.h"
 
-View::View(Game *model): player1("Player 1", font, 30), player2("Player 2", font, 30) {
+View::View(Game *model): player1("", font, 30), player2("", font, 30) {
     m_model = model;
     m_model->addObserver(this);
 
@@ -27,6 +27,8 @@ View::View(Game *model): player1("Player 1", font, 30), player2("Player 2", font
     player2Sprite.setTexture(playerTexture);
 
     font.loadFromFile("./media/fonts/Calibri.ttf");
+    player1.setString(m_model->getFirstPlayerName());
+    player2.setString(m_model->getSecondPlayerName());
     player1.setColor(sf::Color::Black);
     player2.setColor(sf::Color::Black);
 }
@@ -78,8 +80,8 @@ void View::drawMap(Board board) {
     player2Sprite.setPosition(x2 * CELL_SIZE + border, y2 * CELL_SIZE);
     m_Window.draw(player2Sprite);
 
-    player1.setPosition(0, 0);
-    player2.setPosition(CELL_SIZE*mapSize + border, 0);
+    player1.setPosition(10, 0);
+    player2.setPosition(CELL_SIZE*mapSize + border + 10, 0);
     m_Window.draw(player1);
     m_Window.draw(player2);
 
