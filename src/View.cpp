@@ -1,6 +1,6 @@
 #include "View.h"
 
-View::View(Game *model): player1("Player 1", font, 40), player2("Player 2", font, 40) {
+View::View(Game *model): player1("Player 1", font, 30), player2("Player 2", font, 30) {
     m_model = model;
     m_model->addObserver(this);
 
