@@ -4,25 +4,34 @@
 #include <SFML/Window.hpp>
 
 
-Launcher::Launcher(bool *playAgain){
+Launcher::Launcher(bool *playAgain)
+	:singePlayer("Single player", font, 40),
+	multiplayer("Multiplayer", font, 40),
+	exit("Exit", font, 40),
+	again("Play again?", font, 40),
+	yes("Yes", font, 40),
+	no("No", font, 40)
+{
+	
 
 	bool a = playAgain;
 	char answer;
 
-    singlePlayerTexture.loadFromFile("./media/SinglePlayer.png");
-    multiplayerTexture.loadFromFile("./media/Multiplayer.png");
-    exitTexture.loadFromFile("./media/Exit.png");
-	againTexture.loadFromFile("./media/PlayAgain.png");
-	yesTexture.loadFromFile("./media/Yes.png");
-	noTexture.loadFromFile("./media/No.png");
-	
+    // singlePlayerTexture.loadFromFile("./media/SinglePlayer.png");
+    // multiplayerTexture.loadFromFile("./media/Multiplayer.png");
+    // exitTexture.loadFromFile("./media/Exit.png");
+	// againTexture.loadFromFile("./media/PlayAgain.png");
+	// yesTexture.loadFromFile("./media/Yes.png");
+	// noTexture.loadFromFile("./media/No.png");
+	font.loadFromFile("./media/fonts/Calibri.ttf");
 
-    singePlayer.setTexture(singlePlayerTexture);
-    multiplayer.setTexture(multiplayerTexture);
-    exit.setTexture(exitTexture);
-	again.setTexture(againTexture);
-	yes.setTexture(yesTexture);
-	no.setTexture(noTexture);
+    // singePlayer.setTexture(singlePlayerTexture);
+    // multiplayer.setTexture(multiplayerTexture);
+    // exit.setTexture(exitTexture);
+	// again.setTexture(againTexture);
+	// yes.setTexture(yesTexture);
+	// no.setTexture(noTexture);
+
 
     // menu();
 }
@@ -69,9 +78,9 @@ char Launcher::menu(){
 
     while (isMenu)
 	{
-		singePlayer.setColor(sf::Color(0x80, 0x80, 0x0));
-		multiplayer.setColor(sf::Color(0x80, 0x80, 0x0));
-		exit.setColor(sf::Color(0x80, 0x80, 0x0));
+		singePlayer.setColor(sf::Color::Black);
+		multiplayer.setColor(sf::Color::Black);
+		exit.setColor(sf::Color::Black);
 		menuNum = 0;
  
 		if (sf::IntRect(100, 160, 229, 43).contains(sf::Mouse::getPosition(window))) { singePlayer.setColor(sf::Color::Red); menuNum = 1; }
@@ -104,15 +113,15 @@ char Launcher::oneMore(){
 	yes.setPosition(195, 220);
 	no.setPosition(275, 220);
 
-	again.setColor(sf::Color(0x80, 0x80, 0x0));
+	again.setColor(sf::Color::Black);
 	
     while (isOneMore)
 	{
-		yes.setColor(sf::Color(0x80, 0x80, 0x0));
-		no.setColor(sf::Color(0x80, 0x80, 0x0));
+		yes.setColor(sf::Color::Black);
+		no.setColor(sf::Color::Black);
 		menuNum = 0;
  
-		if (sf::IntRect(195, 220, 39, 30).contains(sf::Mouse::getPosition(window))) { yes.setColor(sf::Color::Red); menuNum = 1; }
+		if (sf::IntRect(195, 220, 55, 30).contains(sf::Mouse::getPosition(window))) { yes.setColor(sf::Color::Red); menuNum = 1; }
 		if (sf::IntRect(275, 220, 50, 30).contains(sf::Mouse::getPosition(window))) { no.setColor(sf::Color::Red); menuNum = 2; }
  
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))

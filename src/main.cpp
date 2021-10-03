@@ -12,7 +12,7 @@ void multi(const char* firstName, const char* secondName);
 int main() {
     srand(time(0));
 
-    bool playAgain = false;
+    bool playAgain = true;
 
     do {
         Launcher launcher(&playAgain);
@@ -26,7 +26,8 @@ int main() {
         else if (answer == 'm') multi("Player1", "Player2");
         else if (answer == 'e') playAgain = false;
         
-        answer = launcher.oneMore(); 
+        if (playAgain == true) answer = launcher.oneMore();
+         
 
         // std::cout << "Want to play again? y/N" << std::endl;
         // std::cin >> answer;
