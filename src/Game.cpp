@@ -553,6 +553,14 @@ void Game::getOtherPlayerPosition(int *x, int *y) {
     firstPlayer.getPosition(x, y);
 }
 
+int Game::getFirstPlayerWalls() {
+    return firstPlayer.getWallsCounter();
+}
+
+int Game::getSecondPlayerWalls() {
+    return secondPlayer.getWallsCounter();
+}
+
 const char *Game::getFirstPlayerName() {
     return firstPlayer.getName();
 }
