@@ -1,6 +1,4 @@
 #include "Controller.h"
-#include <SFML/System.hpp>
-#include <SFML/Window.hpp>
 
 Controller::Controller(Game *model, View *view) {
     m_model = model;

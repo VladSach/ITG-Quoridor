@@ -3,6 +3,8 @@
 
 #include "Game.h"
 #include "View.h"
+#include <SFML/System.hpp>
+#include <SFML/Window.hpp>
 
 class Controller {
 private:

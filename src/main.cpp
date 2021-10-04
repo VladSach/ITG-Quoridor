@@ -1,4 +1,5 @@
 #include "Launcher.h"
+#include "ConfigReader.h"
 
 #include <ctime> // time()
 #include <cstdlib> // rand(), srand()
@@ -9,6 +10,7 @@
 // TODO: Config file 
 // TODO: show errors in GUI
 
+    ConfigReader *configReader = ConfigReader::getInstance();
 
 int main() {
     srand(time(0));
