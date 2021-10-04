@@ -1,36 +1,49 @@
 #ifndef LAUNCHER_H
 #define LAUNCHER_H
 
-// #include "Observer.h"
+#include "Game.h"
+#include "View.h"
+#include "Controller.h"
 #include <SFML/Graphics.hpp>
-
-
-
 
 class Launcher{
 private:
     sf::Font font;
 
-    sf::Text singePlayer;
-    sf::Text multiplayer;
-    sf::Text exit;
-    sf::Text again;
-    sf::Text yes;
-    sf::Text no;
+    sf::Text singePlayerText;
+    sf::Text multiplayerText;
+    sf::Text exitText;
+    sf::Text againText;
+    sf::Text yesText;
+    sf::Text noText;
 
-    bool *a;
-    char answer;
+    sf::Event event;
 
-    bool isMenu;
-    bool isOneMore;
-    int menuNum;
+    // Window specifics
+    static const unsigned int characterSize = 40;
+
+    const sf::String launcherTitle = "Quoridor Launcher";
+    const sf::Color backgroundColor = sf::Color(0x80, 0x80, 0x0);
+
+    const int desktopWidth = sf::VideoMode::getDesktopMode().width;
+    const int desktopHeight = sf::VideoMode::getDesktopMode().height;
+
+    const sf::Vector2i centerWindow = {
+        (desktopWidth / 2) - (desktopWidth / 4), 
+        (desktopHeight / 2) - (desktopHeight / 4)
+    };
+
+    const sf::VideoMode windowSize = { windowWidth, windowHeight };
 
 public:
-    Launcher(bool *playAgain);
+    Launcher();
     ~Launcher() = default;
     
-    char menu();
-    char oneMore();
+    void mainMenu();
+    bool exitMenu();
+
+    void singleplayer(const char* firstName, const char* secondName);
+    void multiplayer(const char* firstName, const char* secondName);
 };
 
 #endif // LAUNCHER_H

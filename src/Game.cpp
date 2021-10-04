@@ -92,16 +92,15 @@ void Game::movePlayer(const int x, const int y) {
                 found = true;
             }
         }
-    } else pM = possibleMoves;
 
-    if (found) {
-        pM.push_back(std::make_pair(x, y));
-    } else {
-        movePlayerErrorCheck(x, y);
-    }
+        if (found) {
+            pM.push_back(std::make_pair(x, y));
+        } else {
+            movePlayerErrorCheck(x, y);
+        }
+    } else { pM = possibleMoves; }
 
     currentPlayer->move(pM);
-
 }
 
 void Game::placeWall(const int x, const int y, Direction direction) {
@@ -135,17 +134,10 @@ void Game::movePlayerErrorCheck(const int x, const int y) {
         );
     }
 
-    // Tile is occupied
     int x1, x2, y1, y2;
     firstPlayer.getPosition(&x1, &y1);
     secondPlayer.getPosition(&x2, &y2);
 
-    if ((x1 == x && y1 == y) ||
-        (x2 == x && y2 == y)) {
-            throw std::invalid_argument(
-                "It's already has someone on it"
-            );
-    }
 
     int curX, curY;
     currentPlayer->getPosition(&curX, &curY);
@@ -202,13 +194,21 @@ void Game::movePlayerErrorCheck(const int x, const int y) {
         );
     }
 
+    // More than 1 tile jump
     if (difXAbs > 2 || difYAbs > 2) {
         throw std::invalid_argument(
             "OnE tIlE aT a TiMe"
         );
     }
-}
 
+    // Tile is occupied
+    if ((x1 == x && y1 == y) ||
+        (x2 == x && y2 == y)) {
+            throw std::invalid_argument(
+                "It's already has someone on it"
+            );
+    }
+}
 // * Checks if players in front of each other and solves it
 bool Game::checkPlayersEncounter(){
     int curX, curY, otherX, otherY;

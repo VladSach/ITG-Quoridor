@@ -1,22 +1,17 @@
 #include "View.h"
 
-View::View(Game *model): player1("", font, 30), player2("", font, 30) {
+View::View(Game *model): player1Name("", font, 30), player2Name("", font, 30) {
     m_model = model;
     m_model->addObserver(this);
 
-    unsigned int desktopWidth = sf::VideoMode::getDesktopMode().width;
-    unsigned int desktopHeight = sf::VideoMode::getDesktopMode().height;
-    sf::Vector2i centerWindow((desktopWidth / 2) - (desktopWidth / 4),
-                              (desktopHeight / 2) - (desktopHeight / 4));
-
-    m_Window.create(sf::VideoMode({CELL_SIZE*mapSize + border * 2, CELL_SIZE*mapSize}), 
-                    "Quoridor",
-                    sf::Style::Titlebar |
+    m_Window.create(windowSize, gameTitle, 
+                    sf::Style::Titlebar | 
                     sf::Style::Close);
 
     m_Window.setPosition(centerWindow);
     m_Window.clear(sf::Color::White);
 
+    // Load textures
     boardTexture.loadFromFile("./media/map.png");
     boardTexture.setSmooth(true);
     boardSprite.setTexture(boardTexture);
@@ -26,11 +21,12 @@ View::View(Game *model): player1("", font, 30), player2("", font, 30) {
     player1Sprite.setTexture(playerTexture);
     player2Sprite.setTexture(playerTexture);
 
+    // Set player names
     font.loadFromFile("./media/fonts/Calibri.ttf");
-    player1.setString(m_model->getFirstPlayerName());
-    player2.setString(m_model->getSecondPlayerName());
-    player1.setColor(sf::Color::Black);
-    player2.setColor(sf::Color::Black);
+    player1Name.setString(m_model->getFirstPlayerName());
+    player2Name.setString(m_model->getSecondPlayerName());
+    player1Name.setFillColor(sf::Color::Black);
+    player2Name.setFillColor(sf::Color::Black);
 }
 
 void View::update() {
@@ -51,70 +47,71 @@ void View::drawMap(Board board) {
 
     m_Window.clear(sf::Color::White);
 
+    // * Textures are 50x50 each
     for(int i = 0; i < mapSize; i++){
         for(int j = 0; j < mapSize; j++){
             switch (board.getTile(i,j)) {
             case empty:
-                boardSprite.setTextureRect(sf::IntRect(0, 0, CELL_SIZE, CELL_SIZE));
+                boardSprite.setTextureRect(sf::IntRect(0, 0, tileSize, tileSize));
                 break;
 
             case tile:
-                boardSprite.setTextureRect(sf::IntRect(50, 0, CELL_SIZE, CELL_SIZE));
+                boardSprite.setTextureRect(sf::IntRect(50, 0, tileSize, tileSize));
                 break;
             
             case wall:
-                boardSprite.setTextureRect(sf::IntRect(0, 50, CELL_SIZE, CELL_SIZE));
+                boardSprite.setTextureRect(sf::IntRect(0, 50, tileSize, tileSize));
                 break;
             }
 
-            boardSprite.setPosition(i * CELL_SIZE + border, j * CELL_SIZE);
+            boardSprite.setPosition(i * tileSize + wallsHolderSize, j * tileSize);
             m_Window.draw(boardSprite);
         }   
     }
 
-    player1Sprite.setTextureRect(sf::IntRect(0, 0, CELL_SIZE, CELL_SIZE));
-    player1Sprite.setPosition(x1 * CELL_SIZE + border, y1 * CELL_SIZE);
+    player1Sprite.setTextureRect(sf::IntRect(0, 0, tileSize, tileSize));
+    player1Sprite.setPosition(x1 * tileSize + wallsHolderSize, y1 * tileSize);
     m_Window.draw(player1Sprite);
 
-    player2Sprite.setTextureRect(sf::IntRect(30, 0, CELL_SIZE, CELL_SIZE));
-    player2Sprite.setPosition(x2 * CELL_SIZE + border, y2 * CELL_SIZE);
+    player2Sprite.setTextureRect(sf::IntRect(30, 0, tileSize, tileSize));
+    player2Sprite.setPosition(x2 * tileSize + wallsHolderSize, y2 * tileSize);
     m_Window.draw(player2Sprite);
 
-    player1.setPosition(10, 0);
-    player2.setPosition(CELL_SIZE*mapSize + border + 10, 0);
-    m_Window.draw(player1);
-    m_Window.draw(player2);
+    player1Name.setPosition(10, 0);
+    player2Name.setPosition(tileSize*mapSize + wallsHolderSize + 10, 0);
+    m_Window.draw(player1Name);
+    m_Window.draw(player2Name);
 
-    int walls1, walls2;
-    walls1 = m_model->getFirstPlayerWalls();
-    walls2 = m_model->getSecondPlayerWalls();
+    int wallsFirstPlayer, wallsSecondPlayer;
+    wallsFirstPlayer = m_model->getFirstPlayerWalls();
+    wallsSecondPlayer = m_model->getSecondPlayerWalls();
 
-    for (int i = 0; i < walls1; i++){
-        boardSprite.setTextureRect(sf::IntRect(0, 50, CELL_SIZE, CELL_SIZE));
+    boardSprite.setTextureRect(sf::IntRect(0, 50, tileSize, tileSize));
+
+    for (int i = 0; i < wallsFirstPlayer; i++){
         boardSprite.setPosition(10, 45 + i*45);
         m_Window.draw(boardSprite);
-        boardSprite.setPosition(10 + CELL_SIZE, 45 + i*45);
+        boardSprite.setPosition(10 + tileSize, 45 + i*45);
         m_Window.draw(boardSprite);
-        boardSprite.setPosition(10 + CELL_SIZE*2, 45 + i*45);
+        boardSprite.setPosition(10 + tileSize*2, 45 + i*45);
         m_Window.draw(boardSprite);
     }
 
-    for (int i = 0; i < walls2; i++){
-        boardSprite.setTextureRect(sf::IntRect(0, 50, CELL_SIZE, CELL_SIZE));
-        boardSprite.setPosition(CELL_SIZE*mapSize + border + 10, 45 + i*45);
+    for (int i = 0; i < wallsSecondPlayer; i++){
+        boardSprite.setPosition(tileSize*mapSize + wallsHolderSize + 10, 45 + i*45);
         m_Window.draw(boardSprite);
-        boardSprite.setPosition(CELL_SIZE*mapSize + border + 10 + CELL_SIZE, 45 + i*45);
+        boardSprite.setPosition(tileSize*mapSize + wallsHolderSize + 10 + tileSize, 45 + i*45);
         m_Window.draw(boardSprite);
-        boardSprite.setPosition(CELL_SIZE*mapSize + border + 10 + CELL_SIZE*2, 45 + i*45);
+        boardSprite.setPosition(tileSize*mapSize + wallsHolderSize + 10 + tileSize*2, 45 + i*45);
         m_Window.draw(boardSprite);
     }
 }
 
 void View::drawPossibleMoves(){
     moves = m_model->getPossibleMoves();                    
-    for (unsigned int i = 0; i < moves.size(); i++){
-        boardSprite.setTextureRect(sf::IntRect(100, 0, CELL_SIZE, CELL_SIZE));
-        boardSprite.setPosition(moves[i].first * CELL_SIZE + border, moves[i].second * CELL_SIZE);
+    for (unsigned int i = 0; i < moves.size(); i++) {
+        boardSprite.setTextureRect(sf::IntRect(100, 0, tileSize, tileSize));
+        boardSprite.setPosition(moves[i].first * tileSize + wallsHolderSize, moves[i].second * tileSize);
         m_Window.draw(boardSprite);
     }
     m_Window.display();
