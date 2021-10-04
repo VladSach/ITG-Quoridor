@@ -9,6 +9,13 @@ Launcher::Launcher() :
 	noText("No", font, characterSize) {
 
 	font.loadFromFile("./media/fonts/Calibri.ttf");
+
+	backgroundTexture.loadFromFile("./media/showcase/BlurredCloseShot.jpg");
+	backgroundTexture.setSmooth(true);
+	background.setTexture(backgroundTexture);
+
+	backgroundExitMenuTexture.loadFromFile("./media/showcase/FaceToFaceCloseShot.jpg");
+	backgroundExitMenu.setTexture(backgroundExitMenuTexture);
 }
 
 void Launcher::mainMenu(){
@@ -18,9 +25,22 @@ void Launcher::mainMenu(){
 	
    	window.clear(backgroundColor);
 
+	background.setTextureRect(sf::IntRect(0, 0, 600, 300));
+	background.setScale(1.7f, 1.7f); // Texture height / window height
+
+	window.draw(background);
+
 	singePlayerText.setPosition(100, 160);
 	multiplayerText.setPosition(100, 220);
 	exitText.setPosition(100, 280);
+
+	singePlayerText.setOutlineColor(sf::Color::White);
+	multiplayerText.setOutlineColor(sf::Color::White);
+	exitText.setOutlineColor(sf::Color::White);
+
+	singePlayerText.setOutlineThickness(2);
+	multiplayerText.setOutlineThickness(2);
+	exitText.setOutlineThickness(2);
 
     while (window.isOpen()) {
 		singePlayerText.setFillColor(sf::Color::Black);
@@ -73,11 +93,22 @@ bool Launcher::exitMenu(){
 	window.setPosition(centerWindow);
    	window.clear(backgroundColor);
 
+	backgroundExitMenu.setTextureRect(sf::IntRect(0, 0, window.getSize().x, window.getSize().y));
+	window.draw(backgroundExitMenu);
+
 	againText.setPosition(185, 160);
 	yesText.setPosition(195, 220);
 	noText.setPosition(275, 220);
 
 	againText.setFillColor(sf::Color::Black);
+
+	againText.setOutlineColor(sf::Color::White);
+	yesText.setOutlineColor(sf::Color::White);
+	noText.setOutlineColor(sf::Color::White);
+	
+	againText.setOutlineThickness(2);
+	yesText.setOutlineThickness(2);
+	noText.setOutlineThickness(2);
 	
     while (window.isOpen()) {
 		yesText.setFillColor(sf::Color::Black);
