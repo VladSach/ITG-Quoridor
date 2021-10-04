@@ -1,6 +1,6 @@
 #include "View.h"
 
-View::View(Game *model): player1Name("", font, 30), player2Name("", font, 30) {
+View::View(Game *model): player1Name("", font, 30), player2Name("", font, 30), currentPlayerName("", font, 30) {
     m_model = model;
     m_model->addObserver(this);
 
@@ -27,6 +27,7 @@ View::View(Game *model): player1Name("", font, 30), player2Name("", font, 30) {
     player2Name.setString(m_model->getSecondPlayerName());
     player1Name.setFillColor(sf::Color::Black);
     player2Name.setFillColor(sf::Color::Black);
+    currentPlayerName.setFillColor(sf::Color::Red);
 }
 
 void View::update() {
@@ -77,10 +78,19 @@ void View::drawMap(Board board) {
     player2Sprite.setPosition(x2 * tileSize + wallsHolderSize, y2 * tileSize);
     m_Window.draw(player2Sprite);
 
-    player1Name.setPosition(10, 0);
-    player2Name.setPosition(tileSize*mapSize + wallsHolderSize + 10, 0);
-    m_Window.draw(player1Name);
-    m_Window.draw(player2Name);
+    currentPlayerName.setString(m_model->getCurrentPlayerName());
+    if (currentPlayerName.getString() == player1Name.getString()){
+        currentPlayerName.setPosition(10,0);
+        player2Name.setPosition(tileSize*mapSize + wallsHolderSize + 10, 0);
+        m_Window.draw(currentPlayerName);
+        m_Window.draw(player2Name);
+    } else {
+        player1Name.setPosition(10, 0);
+        currentPlayerName.setPosition(tileSize*mapSize + wallsHolderSize + 10, 0);
+        m_Window.draw(player1Name);
+        m_Window.draw(currentPlayerName);
+    }
+    
 
     int wallsFirstPlayer, wallsSecondPlayer;
     wallsFirstPlayer = m_model->getFirstPlayerWalls();
