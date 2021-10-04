@@ -28,6 +28,7 @@ private:
     sf::Font font;
     sf::Text player1Name;
     sf::Text player2Name;
+    sf::Text currentPlayerName;
 
     std::vector<std::pair<int,int>> moves;
     

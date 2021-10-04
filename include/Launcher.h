@@ -17,6 +17,12 @@ private:
     sf::Text yesText;
     sf::Text noText;
 
+    sf::Texture backgroundTexture;
+    sf::Sprite background;
+
+    sf::Texture backgroundExitMenuTexture;
+    sf::Sprite backgroundExitMenu;
+
     sf::Event event;
 
     // Window specifics
