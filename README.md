@@ -4,7 +4,7 @@ A video game implementation of board game ***Quoridor***.
 
 ## Table of Contents
 
-- [Game Rules](#quoridor)
+- [Game Rules](#game-rules)
 - [Showcase](#showcase)
 - [Requirements](#requirements)
 - [Usage](#usage)
@@ -17,11 +17,15 @@ Quoridor is a 2 or 4-player turn-based strategy game.
 
 Each player is represented by a pawn which begins at the center space of one edge of the board (in a two-player game, the pawns begin opposite each other). The objective is to be the first player to move their pawn to any space on the opposite side of the game board from which it begins.
 
-![BoardFromAbove][BoardPhoto]
+<p align="center" width="100%">
+    <img width="50%" src="./media/showcase/BoardFromAbove.jpg">
+</p>
 
 The distinguishing characteristic of Quoridor is its twenty walls. Walls are flat two-space-wide pieces which can be placed in the groove that runs between the spaces. Walls block the path of all pawns, which must go around them. The walls are divided equally among the players at the start of the game, and once placed, cannot be moved or removed. On a turn, a player may either move their pawn, or, if possible, place a wall.
 
-![Basic rules][RulesImage]
+<p align="center" width="100%">
+    <img width="50%" src="./media/showcase/GameRules.png">
+</p>
 
 More about game can be found on [Wiki](https://en.wikipedia.org/wiki/Quoridor).
 
@@ -41,6 +45,7 @@ ProjectName requires the following to run:
 Project Name is easiest to use with [Make][MakeLink].
 
 `$ make`
+
 `$ make run`
 
 After that the game itself will appear ready to be played. Choose desired mode and start having fun.
@@ -58,14 +63,6 @@ To  **place a wall** click on empty space, if all conditions are met the wall wi
 ## License
 
 ProjectName is licensed under the [MIT][LicenseLink] license. 
-
-<style>
-	img {
-		width:  400px; 
-		margin-left: auto;
-		margin-right: auto;
-		display: block; }
-</style>
 
 [BoardPhoto]: ./media/showcase/BoardFromAbove.jpg
 [RulesImage]: ./media/showcase/GameRules.png
