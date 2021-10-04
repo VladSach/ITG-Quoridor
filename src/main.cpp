@@ -3,12 +3,10 @@
 #include <ctime> // time()
 #include <cstdlib> // rand(), srand()
 
-// TODO: Highlight current player name (DONE)
 // TODO: Slide show in launcher
 // TODO: Input names in launcher
 // TODO: Config file 
 // TODO: show errors in GUI
-
 
 int main() {
     srand(time(0));

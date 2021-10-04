@@ -24,7 +24,7 @@ Each player is represented by a pawn which begins at the center space of one edg
 The distinguishing characteristic of Quoridor is its twenty walls. Walls are flat two-space-wide pieces which can be placed in the groove that runs between the spaces. Walls block the path of all pawns, which must go around them. The walls are divided equally among the players at the start of the game, and once placed, cannot be moved or removed. On a turn, a player may either move their pawn, or, if possible, place a wall.
 
 <p align="center" width="100%">
-    <img width="50%" src="./media/showcase/GameRules.png">
+    <img width="50%" src="./media/showcase/readme/GameRules.png">
 </p>
 
 More about game can be found on [Wiki](https://en.wikipedia.org/wiki/Quoridor).
@@ -32,6 +32,11 @@ More about game can be found on [Wiki](https://en.wikipedia.org/wiki/Quoridor).
 ## Showcase
 
 [//]: # (place gif here with game core gameplay)
+
+Main Menu             |  Gameplay
+:-------------------------:|:-------------------------:
+![](./media/showcase/readme/MainMenuScreenshot.jpg)  |  ![](./media/showcase/readme/GameplayScreenshot.jpg)
+
 
 ## Requirements
 
@@ -44,6 +49,8 @@ ProjectName requires the following to run:
 
 Project Name is easiest to use with [Make][MakeLink].
 
+`$ git clone https://github.com/VladSach/ITG-Quoridor.git`
+
 `$ make`
 
 `$ make run`
@@ -51,13 +58,17 @@ Project Name is easiest to use with [Make][MakeLink].
 After that the game itself will appear ready to be played. Choose desired mode and start having fun.
 
 To **move** player first click on a pawn and then choose available tile.
-To  **place a wall** click on empty space, if all conditions are met the wall will appear.
+
+To **place a wall** click on empty space, if all conditions are met the wall will appear.
 
 ## TODO
 
 - Add AI
 - Add online
+- Add sounds
 - Add 4 players mod
+- Add Main Menu slideshow
+- Add config.ini support
 - Change art style
 
 ## License

@@ -10,7 +10,6 @@ public:
 
 class Observable {
 private:
-    // ? Change vector to simple array?
     std::vector<Observer*> m_observers;
 
 public:
