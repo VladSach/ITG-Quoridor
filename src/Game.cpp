@@ -320,7 +320,7 @@ void Game::placeWallErrorCheck(const int x, const int y, Direction direction) {
     if ((x > 14 && direction == horizontal ) ||
         (y > 14 && direction == vertical)) {
         throw std::invalid_argument(
-            "Look like a half measure to me (;¬_¬)"
+            "Look like a half measure to me"
         );
     }
 

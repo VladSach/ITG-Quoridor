@@ -1,43 +1,66 @@
 #include "Controller.h"
-#include <SFML/System.hpp>
-#include <SFML/Window.hpp>
+#include <stdlib.h>
+#include <string>
 
-Controller::Controller(Game *model, View *view) {
+Controller::Controller(Game *model) {
     m_model = model;
-    m_view = view;
     m_model->initGame();
 }
 
 void Controller::start() {
-    sf::Window *window = m_view->getWindow();
-    while (window->isOpen()){
+    int const mapSize = 9;
+    while (true) {
         try {
             if (m_model->checkGameEnd() == true) break;
+            
             if (m_model->getCurrentPlayerNeedsInput()) {
-                int x, y;
-                m_model->getCurrentPlayerPosition(&x, &y);
+                std::string whatToDo, coordinates;
 
-                sf::Vector2i pixelPos = sf::Mouse::getPosition(*window);
-                sf::Event event;
-                while(window->pollEvent(event)){
-                    if (event.type == sf::Event::Closed) {
-                        window->close();
+                std::cin >> whatToDo >> coordinates;
+
+                if (whatToDo == "move"){
+                    int x, y; 
+                
+                    char coordinateInLetter[mapSize] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'};
+                    for (int i = 0; i < mapSize; i++){
+                        if (coordinateInLetter[i] == coordinates[0]) x = i*2;
                     }
-                    if (event.type == sf::Event::MouseButtonPressed) {
-                        if (sf::IntRect(x * tileSize + wallsHolderSize, y * tileSize, tileSize, tileSize).contains(pixelPos.x, pixelPos.y)){
-                            m_view->drawPossibleMoves();
-                        } else{
-                            m_model->makeTurn((pixelPos.x - wallsHolderSize)/ tileSize, pixelPos.y / tileSize);
-                        }
-                        for (unsigned int i = 0; i < m_model->getPossibleMoves().size(); i++) {
-                            if (sf::IntRect(m_model->getPossibleMoves()[i].first - wallsHolderSize * tileSize, m_model->getPossibleMoves()[i].second * tileSize, tileSize, tileSize).contains(pixelPos.x, pixelPos.y)){
-                                m_model->makeTurn(m_model->getPossibleMoves()[i].first - wallsHolderSize, m_model->getPossibleMoves()[i].second);
-                            }
-                        }
-                    }
+                    
+                    char yInChar = coordinates[1];
+                    y = yInChar - '0';
+                    y -= 1;
+                    y *= 2;
+
+                    m_model->makeTurn(x, y);
                 }
-            } else { m_model->makeTurn(0, 0); }
-        } catch (const std::exception& e) {
+                else if (whatToDo == "wall"){
+                    int x, y;
+                    char coordinateInLetter[mapSize - 1] = {'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+                    for (int i = 0; i < mapSize - 1; i++){
+                        if (coordinateInLetter[i] == coordinates[0]) x = i*2;
+                    }
+                    x += 1;
+                    
+                    char yInChar = coordinates[1];
+                    y = yInChar - '0';
+                    y -= 1;
+                    y *= 2;
+                    y += 1;
+
+                    char wallOrientation = coordinates[2];
+                    if (wallOrientation == 'h') x -= 1;
+                    if (wallOrientation == 'v') y -= 1;
+
+                    m_model->makeTurn(x, y);
+                }
+                else if (whatToDo == "stop") break;
+
+                
+            } else {
+                m_model->makeTurn(0, 0);
+            }
+            
+        } catch(const std::exception& e) {
             std::cerr << e.what() << "\n\n";
         }
     }
