@@ -5,11 +5,15 @@
 #include "Player.h"
 #include "Bot.h"
 #include "Observer.h"
+#include "utility.h"
 
 #include <iostream>
 
 #include <queue>
 #include <stdexcept>
+
+typedef std::pair<int, int> pair_ii;
+typedef std::vector<std::pair<int, int>> vector_pair_ii;
 
 class Game : public Observable {
 private:
@@ -20,7 +24,7 @@ private:
     IPlayer *currentPlayer = nullptr;
     IPlayer *winner = nullptr;
 
-    std::vector<std::pair<int, int>> possibleMoves;
+    vector_pair_ii possibleMoves;
 
 public:
     Game(IPlayer &fp, IPlayer &sp);
@@ -30,12 +34,14 @@ public:
     void initGame();
     bool checkGameEnd();
     void switchCurrentPlayer();
-
     void calculatePossibleMoves();
+    std::vector<coordinates> calculateMeaningfulWalls(IPlayer &player);
+
+    void decideTurn();
     void makeTurn(const int x, const int y);
     void movePlayer(const int x, const int y);
     void placeWall(const int x, const int y, Direction direction);
-
+    
     bool checkPlayersEncounter();
     bool resolvePlayersEncounter(const int x, const int  y);
 
@@ -50,10 +56,10 @@ public:
 
     bool getCurrentPlayerNeedsInput();
 
-    void getFirstPlayerPosition(int *x, int *y);
-    void getSecondPlayerPosition(int *x, int *y);
-    void getCurrentPlayerPosition(int *x, int *y);
-    void getOtherPlayerPosition(int *x, int *y);
+    coordinates getFirstPlayerPosition();
+    coordinates getSecondPlayerPosition();
+    coordinates getCurrentPlayerPosition();
+    coordinates getOtherPlayerPosition();
 
     int getFirstPlayerWalls();
     int getSecondPlayerWalls();
@@ -62,6 +68,15 @@ public:
     const char *getSecondPlayerName();
     const char *getCurrentPlayerName();
     const char *getWinnerName();
+
+    // Minimax algo
+    // TODO: separate class
+    pair_ii decideMovePosition();
+    int minimax(coordinates &action, int depth, bool maximizationPlayer, int alpha, int beta);
+    
+    int heuristic();
+    int heuristicMove();
+    int heuristicWall();
 };
 
 #endif // GAME_H

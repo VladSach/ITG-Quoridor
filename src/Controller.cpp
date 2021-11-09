@@ -14,19 +14,20 @@ void Controller::start() {
         try {
             if (m_model->checkGameEnd() == true) break;
             if (m_model->getCurrentPlayerNeedsInput()) {
-                int x, y;
-                m_model->getCurrentPlayerPosition(&x, &y);
+                coordinates coordCur = m_model->getCurrentPlayerPosition();
+                int x = coordCur.x;
+                int y = coordCur.y;
 
                 sf::Vector2i pixelPos = sf::Mouse::getPosition(*window);
                 sf::Event event;
-                while(window->pollEvent(event)){
+                while(window->pollEvent(event)) {
                     if (event.type == sf::Event::Closed) {
                         window->close();
                     }
                     if (event.type == sf::Event::MouseButtonPressed) {
                         if (sf::IntRect(x * tileSize + wallsHolderSize, y * tileSize, tileSize, tileSize).contains(pixelPos.x, pixelPos.y)){
                             m_view->drawPossibleMoves();
-                        } else{
+                        } else {
                             m_model->makeTurn((pixelPos.x - wallsHolderSize)/ tileSize, pixelPos.y / tileSize);
                         }
                         for (unsigned int i = 0; i < m_model->getPossibleMoves().size(); i++) {
@@ -36,7 +37,9 @@ void Controller::start() {
                         }
                     }
                 }
-            } else { m_model->makeTurn(0, 0); }
+            } else { 
+                m_model->makeTurn(0, 0);
+            }
         } catch (const std::exception& e) {
             std::cerr << e.what() << "\n\n";
         }

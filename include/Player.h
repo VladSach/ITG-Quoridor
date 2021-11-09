@@ -4,6 +4,8 @@
 #include <vector>
 #include <utility>
 
+#include "Board.h"
+#include "utility.h"
 class IPlayer {
 private:
     int m_X;
@@ -15,10 +17,10 @@ public:
 
     virtual const char *getName() const = 0;
     virtual int getWallsCounter() const = 0;
-    virtual int getPosition(int *const x, int *const y) const = 0;
+    virtual coordinates getPosition() const = 0;
 
-    virtual void takeWall() = 0;
     virtual void move(std::vector<std::pair<int, int>> possibleMovements) = 0;
+    virtual void placeWall(const int x, const int y, Direction direction, Board& board) = 0;
     virtual bool needsToTakeInput() = 0;
 
     // rhs means "right hand side"
@@ -49,10 +51,11 @@ public:
 
     const char *getName() const;
     int getWallsCounter() const;
-    int getPosition(int *const x, int *const y) const;
+    coordinates getPosition() const;
 
     void takeWall();
     void move(std::vector<std::pair<int, int>> possibleMovements);
+    void placeWall(const int x, const int y, Direction direction, Board& board);
     bool needsToTakeInput();
 };
 

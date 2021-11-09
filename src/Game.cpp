@@ -21,20 +21,26 @@ void Game::switchCurrentPlayer() {
 }
 
 bool Game::checkGameEnd() {
-    int x1, y1, x2, y2;
-    firstPlayer.getPosition(&x1, &y1);
-    secondPlayer.getPosition(&x2, &y2);
+    coordinates coordF, coordS;
+    coordF = getFirstPlayerPosition();
+    coordS = getSecondPlayerPosition();
 
-    if (y1 == 0) {
+    if (coordF.y == 0) {
         winner = &firstPlayer;
         return true;
-    } else if (y2 == mapSize - 1) {
+    } else if (coordS.y == mapSize - 1) {
         winner = &secondPlayer;
         return true;
     } else {
         winner = nullptr;
         return false;
     }
+}
+
+void Game::decideTurn() {
+    std::pair<int, int> position = decideMovePosition();
+
+    makeTurn(position.first, position.second);
 }
 
 void Game::makeTurn(const int x, const int y) {
@@ -48,7 +54,6 @@ void Game::makeTurn(const int x, const int y) {
         } else { // * Not allow current move
             placeWallErrorCheck(x, y, horizontal);
         }
-
     } else {
         movePlayer(x, y);
     }
@@ -60,8 +65,8 @@ void Game::makeTurn(const int x, const int y) {
 }
 
 void Game::calculatePossibleMoves() {
-    int curX, curY;
-    currentPlayer->getPosition(&curX, &curY);
+    coordinates coordCur;
+    coordCur = getCurrentPlayerPosition();
 
     possibleMoves.clear();
 
@@ -69,8 +74,8 @@ void Game::calculatePossibleMoves() {
 
     if(checkPlayersEncounter()) r = 4;
 
-    for(int x = curX - r; x <= curX + r; x+=2) {
-        for (int y = curY - r; y <= curY + r; y+=2) {
+    for(int x = coordCur.x - r; x <= coordCur.x + r; x+=2) {
+        for (int y = coordCur.y - r; y <= coordCur.y + r; y+=2) {
             try {
                 movePlayerErrorCheck(x, y);
             } catch(const std::exception& e) {
@@ -106,24 +111,7 @@ void Game::movePlayer(const int x, const int y) {
 void Game::placeWall(const int x, const int y, Direction direction) {
     placeWallErrorCheck(x, y, direction);
 
-    switch (direction) {
-    case horizontal:
-        board.placeWall(x, y);
-        board.placeWall(x+1, y);
-        board.placeWall(x+2, y);
-        break;
-    
-    case vertical:
-        board.placeWall(x, y);
-        board.placeWall(x, y+1);
-        board.placeWall(x, y+2); 
-        break;
-
-    default:
-        break;
-    }
-
-    currentPlayer->takeWall();
+    currentPlayer->placeWall(x, y, direction, board);
 }
 
 void Game::movePlayerErrorCheck(const int x, const int y) {
@@ -134,13 +122,16 @@ void Game::movePlayerErrorCheck(const int x, const int y) {
         );
     }
 
-    int x1, x2, y1, y2;
-    firstPlayer.getPosition(&x1, &y1);
-    secondPlayer.getPosition(&x2, &y2);
+    coordinates coordF, coordS;
+    coordF = getFirstPlayerPosition();
+    coordS = getSecondPlayerPosition();
 
 
-    int curX, curY;
-    currentPlayer->getPosition(&curX, &curY);
+    coordinates coordCur;
+    coordCur = getCurrentPlayerPosition();
+    int curX = coordCur.x;
+    int curY = coordCur.y;
+    
 
     const int difX = x - curX;
     const int difY = curY - y;
@@ -202,8 +193,8 @@ void Game::movePlayerErrorCheck(const int x, const int y) {
     }
 
     // Tile is occupied
-    if ((x1 == x && y1 == y) ||
-        (x2 == x && y2 == y)) {
+    if ((coordF.x == x && coordF.y == y) ||
+        (coordS.x == x && coordS.y == y)) {
             throw std::invalid_argument(
                 "It's already has someone on it"
             );
@@ -211,9 +202,12 @@ void Game::movePlayerErrorCheck(const int x, const int y) {
 }
 // * Checks if players in front of each other and solves it
 bool Game::checkPlayersEncounter(){
-    int curX, curY, otherX, otherY;
-    getCurrentPlayerPosition(&curX, &curY);
-    getOtherPlayerPosition(&otherX, &otherY);
+    coordinates coordCur = getCurrentPlayerPosition();
+    coordinates coordOther = getOtherPlayerPosition();
+    int curX = coordCur.x;
+    int curY = coordCur.y;
+    int otherX = coordOther.x;
+    int otherY = coordOther.y;
 
     // P for players
     const int difPX = otherX - curX;
@@ -233,9 +227,12 @@ bool Game::checkPlayersEncounter(){
 }
 
 bool Game::resolvePlayersEncounter(const int x, const int y) {
-    int curX, curY, otherX, otherY;
-    getCurrentPlayerPosition(&curX, &curY);
-    getOtherPlayerPosition(&otherX, &otherY);
+    coordinates coordCur = getCurrentPlayerPosition();
+    coordinates coordOther = getOtherPlayerPosition();
+    int curX = coordCur.x;
+    int curY = coordCur.y;
+    int otherX = coordOther.x;
+    int otherY = coordOther.y;
 
     // P for players
     const int difPX = otherX - curX;
@@ -417,8 +414,9 @@ bool Game::isPathExists(IPlayer &player, const int endCol, Board boardCopy,
     std::queue<int> rq, cq;
 
     // Player position as starting node
-    int sr, sc;
-    player.getPosition(&sr, &sc);
+    coordinates coordP = player.getPosition();
+    int sr = coordP.x;
+    int sc = coordP.y;
 
     // Variables used to track the number of steps taken.
     int moveCount = 0;
@@ -429,10 +427,8 @@ bool Game::isPathExists(IPlayer &player, const int endCol, Board boardCopy,
     bool reachedEnd = false;
 
     bool visited[mapSize][mapSize];
-    for (int i = 0; i < mapSize; i++)
-    {
-        for (int j = 0; j < mapSize; j++)
-        {
+    for (int i = 0; i < mapSize; i++) {
+        for (int j = 0; j < mapSize; j++) {
             visited[i][j] = false;
         }
     }
@@ -451,8 +447,7 @@ bool Game::isPathExists(IPlayer &player, const int endCol, Board boardCopy,
     cq.push(sc);
     visited[sr][sc] = true;
 
-    while (rq.size() > 0)
-    {
+    while (rq.size() > 0) {
         r = rq.front();
         c = cq.front();
         rq.pop();
@@ -535,22 +530,22 @@ bool Game::getCurrentPlayerNeedsInput() {
     return currentPlayer->needsToTakeInput();
 }
 
-void Game::getFirstPlayerPosition(int *x, int *y) {
-    firstPlayer.getPosition(x, y);
+coordinates Game::getFirstPlayerPosition() {
+    return firstPlayer.getPosition();
 }
 
-void Game::getSecondPlayerPosition(int *x, int *y) {
-    secondPlayer.getPosition(x, y);
+coordinates Game::getSecondPlayerPosition() {
+    return secondPlayer.getPosition();
 }
 
-void Game::getCurrentPlayerPosition(int *x, int *y) {
-    currentPlayer->getPosition(x, y);
+coordinates Game::getCurrentPlayerPosition() {
+    return currentPlayer->getPosition();
 }
 
-void Game::getOtherPlayerPosition(int *x, int *y) {
-    (*currentPlayer == firstPlayer) ?
-    secondPlayer.getPosition(x, y) :
-    firstPlayer.getPosition(x, y);
+coordinates Game::getOtherPlayerPosition() {
+    return (*currentPlayer == firstPlayer) ?
+    secondPlayer.getPosition() :
+    firstPlayer.getPosition();
 }
 
 int Game::getFirstPlayerWalls() {
@@ -575,4 +570,155 @@ const char *Game::getCurrentPlayerName() {
 
 const char *Game::getWinnerName() {
     return winner->getName();
+}
+
+pair_ii Game::decideMovePosition() {
+    // Save players initial position
+    coordinates coordF, coordS;
+    coordF = getFirstPlayerPosition();
+    coordS = getSecondPlayerPosition();
+
+    // Save map
+    Board boardCopy = getBoard();
+
+    coordinates move = {0, 0};
+    minimax(move, 5, true, -1000, 1000);
+
+    board = boardCopy;
+    // restore players position and move player
+    
+}
+
+int Game::minimax(coordinates& action, int depth, bool maximizingPlayer, int alpha, int beta) {
+    if (depth == 0 || checkGameEnd()) {
+        return heuristic();
+    }
+
+    calculatePossibleMoves();
+    // TODO: change possible moves to coordinates vector
+    std::vector<coordinates> moves;
+    for (auto move : possibleMoves) {
+        moves.push_back(coordinates{move.first, move.second}); }
+    std::vector<coordinates> walls = calculateMeaningfulWalls(*currentPlayer);
+
+    std::vector<coordinates> allPossibleMoves;
+    allPossibleMoves.reserve(moves.size() + walls.size()); // preallocate memory
+    allPossibleMoves.insert(allPossibleMoves.end(), moves.begin(), moves.end());
+    allPossibleMoves.insert(allPossibleMoves.end(), walls.begin(), walls.end());
+
+
+    int score;
+    for (auto move : allPossibleMoves) {
+        if (maximizingPlayer) {
+            score = minimax(action, --depth, !maximizingPlayer, alpha, beta);
+            if (score > alpha) {
+                if (depth == 0) { action = move; } // ? Условие
+                alpha = score;
+            }
+            if (alpha >= beta) { break; }
+
+            return alpha;
+        } else {
+            score = minimax(action, --depth, !maximizingPlayer, alpha, beta);
+            if (score < beta) {
+                if (depth == 0) { action = move; } // ? Условие
+                beta = score;
+            }
+            if (alpha >= beta) { break; }
+
+            return beta;
+        }
+    }
+
+    // ? Change player here?
+}
+
+int Game::heuristic() {
+
+    int scoreMove = heuristicMove();
+    // int scoreWall = heuristicWall();
+
+    
+    // // If opossite player is closer to finish than current,
+    // // then play wall, otherwise - move
+
+    return scoreMove;
+}
+
+// calculate score from  player 1 to finish
+// calculate score from player 2 to finish with - sign
+int Game::heuristicMove() {
+    int score = 0;
+    coordinates coordF, coordS;
+    coordF = getFirstPlayerPosition();
+    coordS = getSecondPlayerPosition();
+
+    // TODO: Take walls position into account
+    const coordinates finF {coordF.x, 0};
+    const coordinates finS {coordS.x, mapSize-1};
+
+    int distance = distanceBetweenTwoPoints(coordF, finF);
+    int distance2 = distanceBetweenTwoPoints(coordS, finS);
+    distance2 *= -1;
+
+    score = distance2 + distance;
+
+    return -score;
+}
+
+int Game::heuristicWall() {
+    coordinates coordF, coordS;
+    coordF = getFirstPlayerPosition();
+    coordS = getSecondPlayerPosition();
+
+    // We have 4 walls to built around player itself
+    // and few more on +1 radius
+
+    const double modifierNext = 0.5;
+    const double modifierFarNext = 0.25;
+
+    int score = 0;
+    
+
+    return score;
+}
+
+std::vector<coordinates> Game::calculateMeaningfulWalls(IPlayer &player) {
+    // Possible walls location
+    // x-2 y-1, x y-1, x-2 y+1, x y+1
+    // y-2 x-1, y x-1, y-2 x+1, y x+1
+
+    coordinates coordP;
+    coordP = player.getPosition();
+
+    std::vector<coordinates> Walls;
+
+    int r = 2; // * radius
+
+    for(int x = coordP.x - r; x <= coordP.x; x+=2) {
+        for (int y = coordP.y - 1; y <= coordP.y + 1; y+=2) {
+            try {
+                placeWallErrorCheck(x, y, horizontal);
+            } catch(const std::exception& e) {
+                continue;
+            }
+
+            Walls.push_back(coordinates{x, y});
+        }
+    }
+
+    for(int y = coordP.y - r; y <= coordP.y; y+=2) {
+        for (int x = coordP.x - 1; x <= coordP.x + 1; x+=2) {
+            try {
+                placeWallErrorCheck(x, y, vertical);
+            } catch(const std::exception& e) {
+                continue;
+            }
+
+            Walls.push_back(coordinates{x, y});
+        }
+    }
+
+    return Walls;
+
 }

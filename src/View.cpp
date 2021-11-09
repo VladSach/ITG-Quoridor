@@ -41,10 +41,12 @@ void View::update() {
 }
 
 void View::drawMap(Board board) {
-    int x, y, x1, y1, x2, y2;
-    m_model->getCurrentPlayerPosition(&x, &y);
-    m_model->getFirstPlayerPosition(&x1, &y1);  
-    m_model->getSecondPlayerPosition(&x2, &y2);
+    coordinates coordF = m_model->getFirstPlayerPosition();
+    coordinates coordS = m_model->getSecondPlayerPosition();
+    int x1 = coordF.x;
+    int y1 = coordF.y;
+    int x2 = coordS.x;
+    int y2 = coordS.y;
 
     m_Window.clear(sf::Color::White);
 
