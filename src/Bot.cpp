@@ -10,20 +10,12 @@ const char* Bot::getName() const {
     return m_Name;
 }
 
-// @param x,y returning values
-int Bot::getPosition(int *const x, int *const y) const {
-    *x = m_X;
-    *y = m_Y;
-
-    return 0;
+coordinates Bot::getPosition() const {
+    return coordinates{m_X, m_Y};
 }
 
 int Bot::getWallsCounter() const {
     return m_WallsCounter;
-}
-
-void Bot::takeWall() {
-    --m_WallsCounter;
 }
 
 void Bot::move(std::vector<std::pair<int, int>> possibleMovements) {
@@ -31,6 +23,26 @@ void Bot::move(std::vector<std::pair<int, int>> possibleMovements) {
 
     m_X = possibleMovements[randomMove].first;
     m_Y = possibleMovements[randomMove].second;
+}
+
+void Bot::placeWall(const int x, const int y, Direction direction, Board& board) {    
+    switch (direction) {
+    case horizontal:
+        board.placeWall(x, y);
+        board.placeWall(x+1, y);
+        board.placeWall(x+2, y);
+        break;
+    
+    case vertical:
+        board.placeWall(x, y);
+        board.placeWall(x, y+1);
+        board.placeWall(x, y+2);
+        break;
+
+    default:
+        break;
+    }
+    --m_WallsCounter;
 }
 
 bool Bot::needsToTakeInput() {

@@ -18,7 +18,6 @@ void View::update() {
 }
 
 void View::drawMap(Board board) {
-    int x1, y1, x2, y2;
     coordinates coordF = m_model->getFirstPlayerPosition();
     coordinates coordS = m_model->getSecondPlayerPosition();
     int x1 = coordF.x;

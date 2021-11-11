@@ -21,10 +21,10 @@ public:
 
     const char *getName() const;
     int getWallsCounter() const;
-    int getPosition(int *const x, int *const y) const;
+    coordinates getPosition() const;
 
-    void takeWall();
     void move(std::vector<std::pair<int, int>> possibleMovements);
+    void placeWall(const int x, const int y, Direction direction, Board& board);
     bool needsToTakeInput();
 };
 
