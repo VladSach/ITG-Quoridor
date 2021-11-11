@@ -744,35 +744,7 @@ int Game::minimax(coordinates& action, int depth, bool maximizingPlayer, int alp
 }
 
 int Game::heuristic() {
-
-    int scoreMove = heuristicMove();
-    // int scoreWall = heuristicWall();
-
-    // Board boardCopy = getBoard();
-    // int firstPlayerPath = shortestPathToRow(firstPlayer, 0, boardCopy);
-    // int secondPlayerPath = shortestPathToRow(secondPlayer, mapSize - 1, boardCopy);
-
-    // // If opossite player is closer to finish than current,
-    // // then play wall, otherwise - move
-
-    return scoreMove;
-}
-
-// calculate score from  player 1 to finish
-// calculate score from player 2 to finish with - sign
-int Game::heuristicMove() {
     int score = 0;
-    // coordinates coordF, coordS;
-    // coordF = getFirstPlayerPosition();
-    // coordS = getSecondPlayerPosition();
-
-    // TODO: Take walls position into account
-    // const coordinates finF {coordF.x, 0};
-    // const coordinates finS {coordS.x, mapSize-1};
-    
-
-    // int distance = distanceBetweenTwoPoints(coordF, finF);
-    // int distance2 = distanceBetweenTwoPoints(coordS, finS);
 
     Board boardCopy = getBoard();
     int distance = shortestPathToRow(firstPlayer, 0, boardCopy);
@@ -782,23 +754,6 @@ int Game::heuristicMove() {
     score = distance2 + distance;
 
     return -score;
-}
-
-int Game::heuristicWall() {
-    coordinates coordF, coordS;
-    coordF = getFirstPlayerPosition();
-    coordS = getSecondPlayerPosition();
-
-    // We have 4 walls to built around player itself
-    // and few more on +1 radius
-
-    // const double modifierNext = 0.5;
-    // const double modifierFarNext = 0.25;
-
-    int score = 0;
-    
-
-    return score;
 }
 
 std::vector<coordinates> Game::calculateMeaningfulWalls(IPlayer &player) {
