@@ -317,7 +317,7 @@ void Game::placeWallErrorCheck(const int x, const int y, Direction direction) {
     if ((x > 14 && direction == horizontal ) ||
         (y > 14 && direction == vertical)) {
         throw std::invalid_argument(
-            "Look like a half measure to me (;¬_¬)"
+            "Look like a half measure to me"
         );
     }
 
@@ -390,7 +390,7 @@ void Game::placeWallErrorCheck(const int x, const int y, Direction direction) {
 }
 
 // BFS on grid
-bool Game::isPathExists(IPlayer &player, const int endCol, Board boardCopy, 
+int Game::isPathExists(IPlayer &player, const int endCol, Board boardCopy, 
                         const int x, const int y, Direction direction) {
 
     switch (direction) {
@@ -513,9 +513,9 @@ bool Game::isPathExists(IPlayer &player, const int endCol, Board boardCopy,
         }
     }
 
-    if (reachedEnd) return true;
+    if (reachedEnd) return moveCount;
 
-    return false;
+    return 0;
 }
 
 Board Game::getBoard() {
@@ -582,7 +582,8 @@ pair_ii Game::decideMovePosition() {
     Board boardCopy = getBoard();
 
     coordinates move = {0, 0};
-    minimax(move, 5, true, -1000, 1000);
+    coordinates best = {0, 0};
+    minimax(move, best, 5, true, -1000, 1000);
 
     board = boardCopy;
     // restore players position
@@ -590,7 +591,117 @@ pair_ii Game::decideMovePosition() {
     secondPlayer.move(vector_pair_ii {std::make_pair(coordF.x, coordF.y)});
 
     //Make a move
-    makeTurn(move.x, move.y);
+    makeTurn(best.x, best.y);
+}
+
+int Game::shortestPathToRow(IPlayer &player, const int endCol) {
+    
+    // Row Queue and Column Queue
+    std::queue<int> rq, cq;
+
+    // Player position as starting node
+    coordinates coordP = player.getPosition();
+    int sr = coordP.x;
+    int sc = coordP.y;
+
+    // Variables used to track the number of steps taken.
+    int moveCount = 0;
+    int nodesLeftInLayer = 1;
+    int nodesInNextLayer = 0;
+
+    // Variable used to track whether the end ever gets reached
+    bool reachedEnd = false;
+
+    bool visited[mapSize][mapSize];
+    for (int i = 0; i < mapSize; i++) {
+        for (int j = 0; j < mapSize; j++) {
+            visited[i][j] = false;
+        }
+    }
+
+    // Define the direction vectors for
+    // north, south, east and west.
+    //   ↑      ↓     →        ←
+    int dr[4] = {-2, +2, 0, 0};
+    int dc[4] = {0, 0, +2, -2};
+
+    // Current position
+    int r = 0;
+    int c = 0;
+
+    rq.push(sr);
+    cq.push(sc);
+    visited[sr][sc] = true;
+
+    while (rq.size() > 0) {
+        r = rq.front();
+        c = cq.front();
+        rq.pop();
+        cq.pop();
+
+        if (c == endCol) {
+            reachedEnd = true;
+            break;
+        }
+
+        int rr, cc;
+        for (int i = 0; i < 4; i++) {
+            rr = r + dr[i];
+            cc = c + dc[i];
+
+            // Skip out of bounds locations
+            if (rr < 0 || cc < 0)
+                continue;
+            if (rr >= mapSize || cc >= mapSize)
+                continue;
+
+            // Skip visited locations or walls
+            if (visited[rr][cc])
+                continue;
+            
+            int difX = r - rr;
+            int difY = cc - c;
+
+            if (difY > 0) {
+                if (getBoard().getTile(rr, cc-1) == wall) {
+                    continue;
+                }
+            }
+            else if (difY < 0) {
+                if (getBoard().getTile(rr, cc+1) == wall) {
+                    continue;
+                }
+            }
+            else if (difX > 0) {
+                if (getBoard().getTile(rr+1, cc) == wall) {
+                    continue;
+                }
+            }
+            else if (difX < 0) {
+                if (getBoard().getTile(rr-1, cc) == wall) {
+                    continue;
+                }
+            }
+            
+            rq.push(rr);
+            cq.push(cc);
+
+            visited[rr][cc] = true;
+            ++nodesInNextLayer;
+        }
+
+        --nodesLeftInLayer;
+        if (nodesLeftInLayer == 0)
+        {
+            nodesLeftInLayer = nodesInNextLayer;
+            nodesInNextLayer = 0;
+            ++moveCount;
+        }
+    }
+
+    if (reachedEnd) return moveCount;
+
+    return 0;
 }
 
 int Game::minimax(coordinates &move, coordinates &best, int depth, bool maximizingPlayer, int alpha, int beta) {
@@ -617,7 +728,7 @@ int Game::minimax(coordinates &move, coordinates &best, int depth, bool maximizi
         if (maximizingPlayer) {
             score = minimax(move, best, --depth, !maximizingPlayer, alpha, beta);
             if (score > alpha) {
-                action = move;
+                best = move;
                 alpha = score;
             }
             if (alpha >= beta) { break; }
@@ -626,7 +737,7 @@ int Game::minimax(coordinates &move, coordinates &best, int depth, bool maximizi
         } else {
             score = minimax(move,best, --depth, !maximizingPlayer, alpha, beta);
             if (score < beta) {
-                action = move;
+                best = move;
                 beta = score;
             }
             if (alpha >= beta) { break; }
@@ -637,53 +748,15 @@ int Game::minimax(coordinates &move, coordinates &best, int depth, bool maximizi
 }
 
 int Game::heuristic(coordinates &move) {
-
-    int scoreMove = heuristicMove();
-    // int scoreWall = heuristicWall();
-
-    
-    // // If opossite player is closer to finish than current,
-    // // then play wall, otherwise - move
-
-    return scoreMove;
-}
-
-// calculate score from  player 1 to finish
-// calculate score from player 2 to finish with - sign
-int Game::heuristicMove() {
     int score = 0;
-    coordinates coordF, coordS;
-    coordF = getFirstPlayerPosition();
-    coordS = getSecondPlayerPosition();
 
-    // TODO: Take walls position into account
-    const coordinates finF {coordF.x, 0};
-    const coordinates finS {coordS.x, mapSize-1};
-
-    int distance = distanceBetweenTwoPoints(coordF, finF);
-    int distance2 = distanceBetweenTwoPoints(coordS, finS);
+    int distance = shortestPathToRow(firstPlayer, 0);
+    int distance2 = shortestPathToRow(secondPlayer, mapSize - 1);
     distance2 *= -1;
 
     score = distance2 + distance;
 
     return -score;
-}
-
-int Game::heuristicWall() {
-    coordinates coordF, coordS;
-    coordF = getFirstPlayerPosition();
-    coordS = getSecondPlayerPosition();
-
-    // We have 4 walls to built around player itself
-    // and few more on +1 radius
-
-    const double modifierNext = 0.5;
-    const double modifierFarNext = 0.25;
-
-    int score = 0;
-    
-
-    return score;
 }
 
 std::vector<coordinates> Game::calculateMeaningfulWalls(IPlayer &player) {
