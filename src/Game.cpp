@@ -762,9 +762,9 @@ int Game::heuristic() {
 // calculate score from player 2 to finish with - sign
 int Game::heuristicMove() {
     int score = 0;
-    coordinates coordF, coordS;
-    coordF = getFirstPlayerPosition();
-    coordS = getSecondPlayerPosition();
+    // coordinates coordF, coordS;
+    // coordF = getFirstPlayerPosition();
+    // coordS = getSecondPlayerPosition();
 
     // TODO: Take walls position into account
     // const coordinates finF {coordF.x, 0};
