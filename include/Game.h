@@ -47,8 +47,9 @@ public:
 
     void movePlayerErrorCheck(const int x, const int y);
     void placeWallErrorCheck(const int x, const int y, Direction direction);
-    bool isPathExists(IPlayer &player, const int endRow, Board boardCopy,
+    int isPathExists(IPlayer &player, const int endRow, Board boardCopy,
                       const int x, const int y, Direction direction);
+    int shortestPathToRow(IPlayer &player, const int endRow, Board boardCopy);
 
     // * View needed methods
     Board getBoard();
