@@ -756,6 +756,23 @@ int Game::heuristic(coordinates &move) {
 
     score = distance2 + distance;
 
+    int x = move.x;
+    int y = move.y;
+    // * Build a wall
+    if (x % 2 != 0 || y % 2 != 0) {
+        if (x % 2 == 0 && y % 2 != 0) {
+            placeWall(x, y, horizontal);
+        } else if (x % 2 != 0 && y % 2 == 0) {
+            placeWall(x, y, vertical);
+        } else { // * Not allow current move
+            placeWallErrorCheck(x, y, horizontal);
+        }
+    } else {
+        return -score;
+    }
+
+    // Recalculate shortest path
+
     return -score;
 }
 
