@@ -24,7 +24,6 @@ void View::drawMap(Board board) {
 
     char top[17] = {'A', 'S', 'B', 'T', 'C', 'U', 'D', 'V', 'E', 'W', 'F', 'X', 'G', 'Y', 'H', 'Z', 'I'};
     char cells[9] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'};
-    // std::string cells[9] = {"A", "B", "C", "D", "E", "F", "G", "H", "I"};
 
     std::cout << "    ";
     for (int i = 0; i < mapSize; i++) {
