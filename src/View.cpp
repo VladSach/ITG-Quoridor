@@ -19,8 +19,12 @@ void View::update() {
 
 void View::drawMap(Board board) {
     int x1, y1, x2, y2;
-    m_model->getFirstPlayerPosition(&x1, &y1);
-    m_model->getSecondPlayerPosition(&x2, &y2);
+    coordinates coordF = m_model->getFirstPlayerPosition();
+    coordinates coordS = m_model->getSecondPlayerPosition();
+    int x1 = coordF.x;
+    int y1 = coordF.y;
+    int x2 = coordS.x;
+    int y2 = coordS.y;
 
     char top[17] = {'A', 'S', 'B', 'T', 'C', 'U', 'D', 'V', 'E', 'W', 'F', 'X', 'G', 'Y', 'H', 'Z', 'I'};
     char cells[9] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'};

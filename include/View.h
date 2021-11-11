@@ -3,6 +3,7 @@
 
 #include "Game.h"
 #include "Observer.h"
+#include "utility.h"
 
 class View : public Observer {
 private:
