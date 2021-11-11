@@ -589,7 +589,7 @@ pair_ii Game::decideMovePosition() {
     
 }
 
-int Game::shortestPathToRow(IPlayer &player, const int endCol, Board boardCopy) {
+int Game::shortestPathToRow(IPlayer &player, const int endCol) {
     
     // Row Queue and Column Queue
     std::queue<int> rq, cq;
@@ -658,22 +658,22 @@ int Game::shortestPathToRow(IPlayer &player, const int endCol, Board boardCopy) 
             int difY = cc - c;
 
             if (difY > 0) {
-                if (boardCopy.getTile(rr, cc-1) == wall) {
+                if (getBoard().getTile(rr, cc-1) == wall) {
                     continue;
                 }
             }
             else if (difY < 0) {
-                if (boardCopy.getTile(rr, cc+1) == wall) {
+                if (getBoard().getTile(rr, cc+1) == wall) {
                     continue;
                 }
             }
             else if (difX > 0) {
-                if (boardCopy.getTile(rr+1, cc) == wall) {
+                if (getBoard().getTile(rr+1, cc) == wall) {
                     continue;
                 }
             }
             else if (difX < 0) {
-                if (boardCopy.getTile(rr-1, cc) == wall) {
+                if (getBoard().getTile(rr-1, cc) == wall) {
                     continue;
                 }
             }
@@ -746,9 +746,8 @@ int Game::minimax(coordinates& action, int depth, bool maximizingPlayer, int alp
 int Game::heuristic() {
     int score = 0;
 
-    Board boardCopy = getBoard();
-    int distance = shortestPathToRow(firstPlayer, 0, boardCopy);
-    int distance2 = shortestPathToRow(secondPlayer, mapSize - 1, boardCopy);
+    int distance = shortestPathToRow(firstPlayer, 0);
+    int distance2 = shortestPathToRow(secondPlayer, mapSize - 1);
     distance2 *= -1;
 
     score = distance2 + distance;
