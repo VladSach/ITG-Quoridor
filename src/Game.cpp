@@ -747,10 +747,11 @@ int Game::heuristic() {
 
     int scoreMove = heuristicMove();
     // int scoreWall = heuristicWall();
-    Board boardCopy = getBoard();
-    int firstPlayerPath = shortestPathToRow(firstPlayer, 0, boardCopy);
-    int secondPlayerPath = shortestPathToRow(secondPlayer, 0, boardCopy);
-    std::cout << firstPlayerPath << " " << secondPlayerPath << std::endl;
+
+    // Board boardCopy = getBoard();
+    // int firstPlayerPath = shortestPathToRow(firstPlayer, 0, boardCopy);
+    // int secondPlayerPath = shortestPathToRow(secondPlayer, mapSize - 1, boardCopy);
+
     // // If opossite player is closer to finish than current,
     // // then play wall, otherwise - move
 
@@ -766,11 +767,16 @@ int Game::heuristicMove() {
     coordS = getSecondPlayerPosition();
 
     // TODO: Take walls position into account
-    const coordinates finF {coordF.x, 0};
-    const coordinates finS {coordS.x, mapSize-1};
+    // const coordinates finF {coordF.x, 0};
+    // const coordinates finS {coordS.x, mapSize-1};
+    
 
-    int distance = distanceBetweenTwoPoints(coordF, finF);
-    int distance2 = distanceBetweenTwoPoints(coordS, finS);
+    // int distance = distanceBetweenTwoPoints(coordF, finF);
+    // int distance2 = distanceBetweenTwoPoints(coordS, finS);
+
+    Board boardCopy = getBoard();
+    int distance = shortestPathToRow(firstPlayer, 0, boardCopy);
+    int distance2 = shortestPathToRow(secondPlayer, mapSize - 1, boardCopy);
     distance2 *= -1;
 
     score = distance2 + distance;
