@@ -585,13 +585,17 @@ pair_ii Game::decideMovePosition() {
     minimax(move, 5, true, -1000, 1000);
 
     board = boardCopy;
-    // restore players position and move player
-    
+    // restore players position
+    firstPlayer.move(vector_pair_ii {std::make_pair(coordF.x, coordF.y)});
+    secondPlayer.move(vector_pair_ii {std::make_pair(coordF.x, coordF.y)});
+
+    //Make a move
+    makeTurn(move.x, move.y);
 }
 
-int Game::minimax(coordinates& action, int depth, bool maximizingPlayer, int alpha, int beta) {
+int Game::minimax(coordinates &move, coordinates &best, int depth, bool maximizingPlayer, int alpha, int beta) {
     if (depth == 0 || checkGameEnd()) {
-        return heuristic();
+        return heuristic(move);
     }
 
     calculatePossibleMoves();
@@ -606,22 +610,23 @@ int Game::minimax(coordinates& action, int depth, bool maximizingPlayer, int alp
     allPossibleMoves.insert(allPossibleMoves.end(), moves.begin(), moves.end());
     allPossibleMoves.insert(allPossibleMoves.end(), walls.begin(), walls.end());
 
+    switchCurrentPlayer();
 
     int score;
     for (auto move : allPossibleMoves) {
         if (maximizingPlayer) {
-            score = minimax(action, --depth, !maximizingPlayer, alpha, beta);
+            score = minimax(move, best, --depth, !maximizingPlayer, alpha, beta);
             if (score > alpha) {
-                if (depth == 0) { action = move; } // ? Условие
+                action = move;
                 alpha = score;
             }
             if (alpha >= beta) { break; }
 
             return alpha;
         } else {
-            score = minimax(action, --depth, !maximizingPlayer, alpha, beta);
+            score = minimax(move,best, --depth, !maximizingPlayer, alpha, beta);
             if (score < beta) {
-                if (depth == 0) { action = move; } // ? Условие
+                action = move;
                 beta = score;
             }
             if (alpha >= beta) { break; }
@@ -629,11 +634,9 @@ int Game::minimax(coordinates& action, int depth, bool maximizingPlayer, int alp
             return beta;
         }
     }
-
-    // ? Change player here?
 }
 
-int Game::heuristic() {
+int Game::heuristic(coordinates &move) {
 
     int scoreMove = heuristicMove();
     // int scoreWall = heuristicWall();

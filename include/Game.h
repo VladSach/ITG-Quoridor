@@ -72,9 +72,9 @@ public:
     // Minimax algo
     // TODO: separate class
     pair_ii decideMovePosition();
-    int minimax(coordinates &action, int depth, bool maximizationPlayer, int alpha, int beta);
+    int minimax(coordinates &move, coordinates &action, int depth, bool maximizationPlayer, int alpha, int beta);
     
-    int heuristic();
+    int heuristic(coordinates &move);
     int heuristicMove();
     int heuristicWall();
 };
