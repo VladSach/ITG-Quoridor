@@ -6,6 +6,7 @@ Controller::Controller(Game *model) {
     m_model->initGame();
 }
 
+// TODO: clear incorrect input
 void Controller::start() {
     int const mapSize = 9;
     while (true) {

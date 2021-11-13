@@ -6,6 +6,19 @@ Bot::Bot(const int x, const int y, const char* name) {
     m_Name = name;
 }
 
+void Bot::move(const int x, const int y) {
+    m_X = x;
+    m_Y = y;
+}
+
+void Bot::reduceWall() {    
+    --m_WallsCounter;
+}
+
+bool Bot::needsToTakeInput() {
+    return false;
+}
+
 const char* Bot::getName() const {
     return m_Name;
 }
@@ -16,35 +29,4 @@ coordinates Bot::getPosition() const {
 
 int Bot::getWallsCounter() const {
     return m_WallsCounter;
-}
-
-void Bot::move(std::vector<coordinates> possibleMovements) {
-    int randomMove = rand() % possibleMovements.size();
-
-    m_X = possibleMovements[randomMove].x;
-    m_Y = possibleMovements[randomMove].y;
-}
-
-void Bot::placeWall(const int x, const int y, Direction direction, Board& board) {    
-    switch (direction) {
-    case horizontal:
-        board.placeWall(x, y);
-        board.placeWall(x+1, y);
-        board.placeWall(x+2, y);
-        break;
-    
-    case vertical:
-        board.placeWall(x, y);
-        board.placeWall(x, y+1);
-        board.placeWall(x, y+2);
-        break;
-
-    default:
-        break;
-    }
-    --m_WallsCounter;
-}
-
-bool Bot::needsToTakeInput() {
-    return false;
 }

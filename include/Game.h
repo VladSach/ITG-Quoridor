@@ -6,13 +6,16 @@
 #include "Bot.h"
 #include "Observer.h"
 #include "ErrorHandler.h"
+#include "GreatBoard.h"
 #include "utility.h"
 
 #include <iostream>
 
+// TODO: One day rename board to map and greatBoard to board
 class Game : public Observable {
 private:
     Board board;
+    GreatBoard greatBoard;
     ErrorHandler checker;
 
     IPlayer &firstPlayer;
@@ -27,18 +30,19 @@ public:
     Game(IPlayer &fp, IPlayer &sp);
     ~Game() = default;
 
-
     void initGame();
     bool checkGameEnd();
     void switchCurrentPlayer();
-    void calculatePossibleMoves();
+    
     std::vector<coordinates> calculateMeaningfulWalls(IPlayer &player);
 
     void decideTurn();
     void makeTurn(const int x, const int y);
     void movePlayer(const int x, const int y);
-    void placeWall(const int x, const int y, Direction direction);
+    void placeWall(const int x, const int y);
     
+    void updatePossibleMoves();
+
     // * Getters
     Board getBoard();
     std::vector<coordinates> getPossibleMoves();

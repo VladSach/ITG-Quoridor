@@ -1,6 +1,10 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
+enum {
+    WallsAmount = 10,
+};
+
 struct coordinates {
     int x;
     int y;

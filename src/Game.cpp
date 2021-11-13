@@ -9,7 +9,7 @@ void Game::initGame() {
     // Decides who acts first
     currentPlayer = &firstPlayer;
     otherPlayer = &secondPlayer;
-    calculatePossibleMoves();
+    updatePossibleMoves();
 
     notifyUpdate();
 }
@@ -42,90 +42,60 @@ bool Game::checkGameEnd() {
 }
 
 void Game::decideTurn() {
-    // coordinates position = decideMovePosition();
-
-    makeTurn(0, 0);
+    //coordinates position = greatBoard.decideMove();
+    //makeTurn(position.x, position.y);
+    makeTurn(0,0);
 }
 
 void Game::makeTurn(const int x, const int y) {
 
     // * Build a wall or move
     if (x % 2 != 0 || y % 2 != 0) {
-        if (x % 2 == 0 && y % 2 != 0) {
-            placeWall(x, y, horizontal);
-        } else if (x % 2 != 0 && y % 2 == 0) {
-            placeWall(x, y, vertical);
-        } else { // * Not allow current move
-            checker.placeWallErrorCheck(coordinates {x, y}, horizontal,
-                                        *currentPlayer, board);
-        }
+        placeWall(x, y);
     } else {
         movePlayer(x, y);
     }
 
     switchCurrentPlayer();
-    calculatePossibleMoves();
+    updatePossibleMoves();
     checkGameEnd();
     notifyUpdate();
 }
 
-// Calculates possible moves directions for current player
-void Game::calculatePossibleMoves() {
-    const coordinates coordCur = getCurrentPlayerPosition();
-    const coordinates coordOther = getOtherPlayerPosition();
+void Game::movePlayer(const int x, const int y) {
+    bool isOk = greatBoard.movePlayer(x, y, *currentPlayer, board, possibleMoves);
 
-    possibleMoves.clear();
+    // * Returns player a message why his move is wrong
+    // ! Using exceptions to do this is actually a terrible idea
+    // ! But it's a pain to rewrite whole error system, so I won't do it
+    if (!isOk) {
+        checker.movePlayerErrorCheck(coordinates {x, y},
+                                     getCurrentPlayerPosition(),
+                                     getOtherPlayerPosition(),
+                                     board);
+    }
 
-    int r = 2; // * radius
+}
 
-    if(checker.checkPlayersEncounter(coordCur, coordOther)) r = 4;
-
-    for(int x = coordCur.x - r; x <= coordCur.x + r; x+=2) {
-        for (int y = coordCur.y - r; y <= coordCur.y + r; y+=2) {
-            try {
-                checker.movePlayerErrorCheck(coordinates {x, y}, coordCur,
-                                             coordOther, board);
-            } catch(const std::exception& e) {
-                continue;
-            }
-
-            checker.addMove(possibleMoves);
-            possibleMoves.push_back(coordinates {x, y});
-        }
+void Game::placeWall(const int x, const int y) {
+    if (x % 2 == 0 && y % 2 != 0) {
+        checker.placeWallErrorCheck(coordinates {x, y}, horizontal, *currentPlayer, board);
+        greatBoard.placeWall(x, y, horizontal, *currentPlayer, board);
+    } else if (x % 2 != 0 && y % 2 == 0) {
+        checker.placeWallErrorCheck(coordinates {x, y}, vertical, *currentPlayer, board);
+        greatBoard.placeWall(x, y, vertical, *currentPlayer, board);
     }
 }
 
-void Game::movePlayer(const int x, const int y) {
-    std::vector<coordinates> pM;
-    bool found = false;
-
-    if (currentPlayer->needsToTakeInput()) {
-        for (auto e : possibleMoves) {
-            if (e.x == x && e.y == y) {
-                found = true;
-            }
-        }
-
-        if (found) {
-            pM.push_back(coordinates {x, y});
-        } else {
-            checker.movePlayerErrorCheck(coordinates {x, y},
-                                         getCurrentPlayerPosition(),
-                                         getOtherPlayerPosition(),
-                                         board);
-            checker.addMove(possibleMoves);
-        }
-    } else { pM = possibleMoves; }
-
-    currentPlayer->move(pM);
+void Game::updatePossibleMoves() {
+    possibleMoves = greatBoard.calculatePossibleMoves(getCurrentPlayerPosition(),
+                                                      getOtherPlayerPosition(),
+                                                      board, checker);
 }
 
-void Game::placeWall(const int x, const int y, Direction direction) {
-    checker.placeWallErrorCheck(coordinates {x, y}, direction,
-                                *currentPlayer, board);
-
-    currentPlayer->placeWall(x, y, direction, board);
-}
+// * -------------------------------------------------- *
+// *                    Getters                         *
+// * -------------------------------------------------- *
 
 Board Game::getBoard() {
     return board;
@@ -166,7 +136,6 @@ int Game::getSecondPlayerWalls() {
 const char *Game::getFirstPlayerName() {
     return firstPlayer.getName();
 }
-
 const char *Game::getSecondPlayerName() {
     return secondPlayer.getName();
 }

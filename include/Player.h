@@ -4,8 +4,8 @@
 #include <vector>
 #include <utility>
 
-#include "Board.h"
 #include "utility.h"
+
 class IPlayer {
 private:
     int m_X;
@@ -19,9 +19,9 @@ public:
     virtual int getWallsCounter() const = 0;
     virtual coordinates getPosition() const = 0;
 
-    virtual void move(std::vector<coordinates> possibleMovements) = 0;
-    virtual void placeWall(const int x, const int y, Direction direction, Board& board) = 0;
+    virtual void reduceWall() = 0;
     virtual bool needsToTakeInput() = 0;
+    virtual void move(const int x, const int y) = 0;
 
     // rhs means "right hand side"
     bool operator == (const IPlayer &rhs) const {
@@ -42,7 +42,7 @@ private:
 
     const char *m_Name;
     
-    int m_WallsCounter = 10;
+    int m_WallsCounter = WallsAmount;
 
 public:
     Player(const int x, const int y, const char *name);
@@ -53,10 +53,9 @@ public:
     int getWallsCounter() const;
     coordinates getPosition() const;
 
-    void takeWall();
-    void move(std::vector<coordinates> possibleMovements);
-    void placeWall(const int x, const int y, Direction direction, Board& board);
+    void reduceWall();
     bool needsToTakeInput();
+    void move(const int x, const int y);
 };
 
 #endif // PLAYER_H

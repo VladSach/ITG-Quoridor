@@ -3,8 +3,6 @@
 
 #include "Player.h"
 
-#include <cstdlib>
-
 class Bot : public IPlayer {
 private:
     int m_X;
@@ -12,7 +10,7 @@ private:
 
     const char *m_Name;
     
-    int m_WallsCounter = 10;
+    int m_WallsCounter = WallsAmount;
   
 public:
     Bot(const int x, const int y, const char *name);
@@ -23,9 +21,9 @@ public:
     int getWallsCounter() const;
     coordinates getPosition() const;
 
-    void move(std::vector<coordinates> possibleMovements);
-    void placeWall(const int x, const int y, Direction direction, Board& board);
+    void reduceWall();
     bool needsToTakeInput();
+    void move(const int x, const int y);
 };
 
 #endif // BOT_H
