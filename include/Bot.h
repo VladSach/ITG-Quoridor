@@ -23,7 +23,7 @@ public:
     int getWallsCounter() const;
     coordinates getPosition() const;
 
-    void move(std::vector<std::pair<int, int>> possibleMovements);
+    void move(std::vector<coordinates> possibleMovements);
     void placeWall(const int x, const int y, Direction direction, Board& board);
     bool needsToTakeInput();
 };

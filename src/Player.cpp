@@ -18,9 +18,9 @@ int Player::getWallsCounter() const {
     return m_WallsCounter;
 }
 
-void Player::move(std::vector<std::pair<int, int>> possibleMovements) { 
-    m_X = possibleMovements[0].first;
-    m_Y = possibleMovements[0].second;
+void Player::move(std::vector<coordinates> possibleMovements) { 
+    m_X = possibleMovements[0].x;
+    m_Y = possibleMovements[0].y;
 }
 
 void Player::placeWall(const int x, const int y, Direction direction, Board& board) {

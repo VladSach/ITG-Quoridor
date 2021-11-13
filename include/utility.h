@@ -16,6 +16,12 @@ inline unsigned int distanceBetweenTwoPoints(coordinates start, coordinates end)
     return distance; 
 }
 
-
+inline unsigned int absQ(int number) {
+    // * No need for cmath library
+    // * http://graphics.stanford.edu/~seander/bithacks.html#IntegerAbs
+    const int mask = number >> (sizeof(int) * __CHAR_BIT__ - 1);
+    unsigned int absNumber = (number + mask) ^ mask;
+    return absNumber;
+}
 
 #endif // UTILITY_H

@@ -18,11 +18,11 @@ int Bot::getWallsCounter() const {
     return m_WallsCounter;
 }
 
-void Bot::move(std::vector<std::pair<int, int>> possibleMovements) {
+void Bot::move(std::vector<coordinates> possibleMovements) {
     int randomMove = rand() % possibleMovements.size();
 
-    m_X = possibleMovements[randomMove].first;
-    m_Y = possibleMovements[randomMove].second;
+    m_X = possibleMovements[randomMove].x;
+    m_Y = possibleMovements[randomMove].y;
 }
 
 void Bot::placeWall(const int x, const int y, Direction direction, Board& board) {    

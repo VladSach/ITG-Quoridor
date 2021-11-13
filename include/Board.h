@@ -26,7 +26,7 @@ public:
     ~Board() = default;
 
     void initBoard();
-    int getTile(const int x, const int y);
+    int getTile(const int x, const int y) const;
     void placeWall(const int x, const int y);
 };
 

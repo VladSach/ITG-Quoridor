@@ -5,26 +5,23 @@
 #include "Player.h"
 #include "Bot.h"
 #include "Observer.h"
+#include "ErrorHandler.h"
 #include "utility.h"
 
 #include <iostream>
 
-#include <queue>
-#include <stdexcept>
-
-typedef std::pair<int, int> pair_ii;
-typedef std::vector<std::pair<int, int>> vector_pair_ii;
-
 class Game : public Observable {
 private:
     Board board;
+    ErrorHandler checker;
 
     IPlayer &firstPlayer;
     IPlayer &secondPlayer;
     IPlayer *currentPlayer = nullptr;
+    IPlayer *otherPlayer = nullptr;
     IPlayer *winner = nullptr;
 
-    vector_pair_ii possibleMoves;
+    std::vector<coordinates> possibleMoves;
 
 public:
     Game(IPlayer &fp, IPlayer &sp);
@@ -42,18 +39,9 @@ public:
     void movePlayer(const int x, const int y);
     void placeWall(const int x, const int y, Direction direction);
     
-    bool checkPlayersEncounter();
-    bool resolvePlayersEncounter(const int x, const int  y);
-
-    void movePlayerErrorCheck(const int x, const int y);
-    void placeWallErrorCheck(const int x, const int y, Direction direction);
-    int isPathExists(IPlayer &player, const int endRow, Board boardCopy,
-                      const int x, const int y, Direction direction);
-    int shortestPathToRow(IPlayer &player, const int endRow);
-
-    // * View needed methods
+    // * Getters
     Board getBoard();
-    std::vector<std::pair<int, int>> getPossibleMoves();
+    std::vector<coordinates> getPossibleMoves();
 
     bool getCurrentPlayerNeedsInput();
 
@@ -72,9 +60,11 @@ public:
 
     // Minimax algo
     // TODO: separate class
-    pair_ii decideMovePosition();
+    coordinates decideMovePosition();
     int minimax(coordinates &move, coordinates &action, int depth, bool maximizationPlayer, int alpha, int beta);
     
+    int shortestPathToRow(IPlayer &player, const int endRow);
+
     int heuristic(coordinates &move);
     int heuristicMove();
     int heuristicWall();

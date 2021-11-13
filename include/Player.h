@@ -19,7 +19,7 @@ public:
     virtual int getWallsCounter() const = 0;
     virtual coordinates getPosition() const = 0;
 
-    virtual void move(std::vector<std::pair<int, int>> possibleMovements) = 0;
+    virtual void move(std::vector<coordinates> possibleMovements) = 0;
     virtual void placeWall(const int x, const int y, Direction direction, Board& board) = 0;
     virtual bool needsToTakeInput() = 0;
 
@@ -54,7 +54,7 @@ public:
     coordinates getPosition() const;
 
     void takeWall();
-    void move(std::vector<std::pair<int, int>> possibleMovements);
+    void move(std::vector<coordinates> possibleMovements);
     void placeWall(const int x, const int y, Direction direction, Board& board);
     bool needsToTakeInput();
 };

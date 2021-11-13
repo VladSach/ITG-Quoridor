@@ -63,11 +63,11 @@ void View::drawMap(Board board) {
     }
     std::cout << std::endl;
 
-    std::vector<std::pair<int, int>> moves = m_model->getPossibleMoves();
+    std::vector<coordinates> moves = m_model->getPossibleMoves();
 
     std::cout << m_model->getCurrentPlayerName() << " Can move as this: ";
     for(auto e : moves) {
-        std::cout << cells[e.first/2] << ' ' << e.second/2 + 1 << ' ';
+        std::cout << cells[e.x/2] << ' ' << e.y/2 + 1 << ' ';
         std::cout << '|' << ' ';
     }
 
