@@ -1,62 +1,58 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "Bot.h"
 #include "Board.h"
 #include "Player.h"
-#include "Bot.h"
+#include "utility.h"
 #include "Observer.h"
+#include "GreatBoard.h"
+#include "MoveChooser.h"
+#include "ErrorHandler.h"
 
-#include <iostream>
-
-#include <queue>
-#include <stdexcept>
-
+// TODO: One day rename board to map and greatBoard to board
 class Game : public Observable {
 private:
     Board board;
+    GreatBoard greatBoard;
+    MoveChooser chooser;
 
     IPlayer &firstPlayer;
     IPlayer &secondPlayer;
     IPlayer *currentPlayer = nullptr;
+    IPlayer *otherPlayer = nullptr;
     IPlayer *winner = nullptr;
 
-    std::vector<std::pair<int, int>> possibleMoves;
+    std::vector<coordinates> possibleMoves;
 
 public:
     Game(IPlayer &fp, IPlayer &sp);
     ~Game() = default;
 
-
     void initGame();
     bool checkGameEnd();
     void switchCurrentPlayer();
-
-    void calculatePossibleMoves();
+    
+    void decideTurn();
     void makeTurn(const int x, const int y);
     void movePlayer(const int x, const int y);
-    void placeWall(const int x, const int y, Direction direction);
+    void placeWall(const int x, const int y);
+    
+    void updatePossibleMoves();
 
-    bool checkPlayersEncounter();
-    bool resolvePlayersEncounter(const int x, const int  y);
-
-    void movePlayerErrorCheck(const int x, const int y);
-    void placeWallErrorCheck(const int x, const int y, Direction direction);
-    bool isPathExists(IPlayer &player, const int endRow, Board boardCopy,
-                      const int x, const int y, Direction direction);
-
-    // * View needed methods
+    // * Getters
     Board getBoard();
-    std::vector<std::pair<int, int>> getPossibleMoves();
+    std::vector<coordinates> getPossibleMoves();
 
     bool getCurrentPlayerNeedsInput();
 
-    void getFirstPlayerPosition(int *x, int *y);
-    void getSecondPlayerPosition(int *x, int *y);
-    void getCurrentPlayerPosition(int *x, int *y);
-    void getOtherPlayerPosition(int *x, int *y);
-
     int getFirstPlayerWalls();
     int getSecondPlayerWalls();
+
+    coordinates getFirstPlayerPosition();
+    coordinates getSecondPlayerPosition();
+    coordinates getCurrentPlayerPosition();
+    coordinates getOtherPlayerPosition();
 
     const char *getFirstPlayerName();
     const char *getSecondPlayerName();

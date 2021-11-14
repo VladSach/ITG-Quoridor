@@ -1,20 +1,7 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-enum {
-    mapSize = 17
-};
-
-enum Field {
-    empty = 0,
-    tile  = 1,
-    wall  = 2
-};
-
-enum Direction {
-    horizontal = 0,
-    vertical
-};
+#include "utility.h"
 
 class Board {
 private:
@@ -26,8 +13,9 @@ public:
     ~Board() = default;
 
     void initBoard();
-    int getTile(const int x, const int y);
+    int getTile(const int x, const int y) const;
     void placeWall(const int x, const int y);
+    void freeWall(const int x, const int y);
 };
 
 #endif // BOARD_H

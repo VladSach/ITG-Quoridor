@@ -4,10 +4,13 @@
 #include <vector>
 #include <utility>
 
+#include "utility.h"
+
 class IPlayer {
 private:
     int m_X;
     int m_Y;
+    int m_EndY;
     const char* m_Name;
 
 public:
@@ -15,18 +18,20 @@ public:
 
     virtual const char *getName() const = 0;
     virtual int getWallsCounter() const = 0;
-    virtual int getPosition(int *const x, int *const y) const = 0;
+    virtual coordinates getPosition() const = 0;
+    virtual int getEndY() const = 0;
 
-    virtual void takeWall() = 0;
-    virtual void move(std::vector<std::pair<int, int>> possibleMovements) = 0;
+    virtual void reduceWall() = 0;
+    virtual void returnWall() = 0;
     virtual bool needsToTakeInput() = 0;
+    virtual void move(const int x, const int y) = 0;
 
     // rhs means "right hand side"
     bool operator == (const IPlayer &rhs) const {
-        return
-               this->m_X == rhs.m_X
+        return this->m_X == rhs.m_X
             && this->m_Y == rhs.m_Y
-            && this->m_Name == rhs.m_Name;
+            && this->m_Name == rhs.m_Name
+            && this->m_EndY == rhs.m_EndY;
     }
 
 private:
@@ -37,10 +42,11 @@ class Player : public IPlayer {
 private:
     int m_X;
     int m_Y;
+    int m_EndY;
 
     const char *m_Name;
     
-    int m_WallsCounter = 10;
+    int m_WallsCounter = WallsAmount;
 
 public:
     Player(const int x, const int y, const char *name);
@@ -49,11 +55,26 @@ public:
 
     const char *getName() const;
     int getWallsCounter() const;
-    int getPosition(int *const x, int *const y) const;
+    coordinates getPosition() const;
+    int getEndY() const;
 
-    void takeWall();
-    void move(std::vector<std::pair<int, int>> possibleMovements);
+    void reduceWall();
+    void returnWall();
     bool needsToTakeInput();
+    void move(const int x, const int y);
+
+    Player& operator=(const Player& rhs) {
+        // Guard self assignment
+        if (this == &rhs)
+            return *this;
+
+        this->m_X = rhs.m_X;
+        this->m_Y = rhs.m_Y;
+        this->m_Name = rhs.m_Name;
+        this->m_EndY = rhs.m_EndY;
+
+        return *this;
+    };
 };
 
 #endif // PLAYER_H
