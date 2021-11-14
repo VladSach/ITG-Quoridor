@@ -9,10 +9,19 @@
 #include <stdexcept>
 
 class ErrorHandler {
+protected:
+    ErrorHandler(){ }
+
+    static ErrorHandler* singleton_;
+
 private:
     coordinates kludge = {1337, 1337};
 
 public:
+    ErrorHandler(ErrorHandler &other) = delete;
+    void operator=(const ErrorHandler &) = delete;
+    static ErrorHandler *GetInstance();
+
     void movePlayerErrorCheck(const coordinates &move, 
                               const coordinates &cur, 
                               const coordinates &other,
@@ -28,7 +37,7 @@ public:
 
     void placeWallErrorCheck(const coordinates &move, Direction direction,
                              IPlayer &cur, const Board &board);
-    int isPathExists(Board boardCopy, const int x, const int y, Direction direction);
+    bool isPathExists(Board boardCopy, const int x, const int y, Direction direction);
 
     void addMove(std::vector<coordinates> &moves);
 };

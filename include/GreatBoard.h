@@ -15,11 +15,16 @@ public:
                    std::vector<coordinates> moves);
     void placeWall(const int x, const int y, Direction direction, 
                    IPlayer &player, Board &board);
+    void freeWall(const int x, const int y, Direction direction, 
+                  IPlayer &player, Board &board);
 
     std::vector<coordinates> calculatePossibleMoves(const coordinates &cur,
                                                     const coordinates &other,
-                                                    Board &board,
-                                                    ErrorHandler checker);
+                                                    Board &board);
+
+    std::vector<coordinates> calculateMeaningfulWalls(IPlayer &cur,
+                                                      Board board,
+                                                      const int r);
 
     coordinates decideMove();
 };

@@ -3,6 +3,8 @@
 
 #include "Game.h"
 
+#include <iostream>
+
 class Controller {
 private:
     Game *m_model;

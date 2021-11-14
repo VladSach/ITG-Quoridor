@@ -23,3 +23,9 @@ int Board::getTile(const int x, const int y) const{
 void Board::placeWall(const int x, const int y) {
     map[y][x] = wall;
 }
+
+void Board::freeWall(const int x, const int y) {
+    if (x % 2 != 0 || y % 2 != 0) {
+        map[y][x] = empty;
+    }
+}

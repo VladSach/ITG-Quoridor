@@ -4,6 +4,8 @@ Bot::Bot(const int x, const int y, const char* name) {
     m_X = x;
     m_Y = y;
     m_Name = name;
+
+    m_EndY = (y == 0) ? mapSize-1 : 0;
 }
 
 void Bot::move(const int x, const int y) {
@@ -13,6 +15,10 @@ void Bot::move(const int x, const int y) {
 
 void Bot::reduceWall() {    
     --m_WallsCounter;
+}
+
+void Bot::returnWall() {
+    ++m_WallsCounter;
 }
 
 bool Bot::needsToTakeInput() {
@@ -29,4 +35,8 @@ coordinates Bot::getPosition() const {
 
 int Bot::getWallsCounter() const {
     return m_WallsCounter;
+}
+
+int Bot::getEndY() const {
+    return m_EndY;
 }

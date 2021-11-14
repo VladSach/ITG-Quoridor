@@ -1,5 +1,14 @@
 #include "ErrorHandler.h"
 
+ErrorHandler* ErrorHandler::singleton_ = nullptr;
+
+ErrorHandler *ErrorHandler::GetInstance() {
+    if (singleton_ == nullptr) {
+        singleton_ = new ErrorHandler();
+    }
+    return singleton_;
+}
+
 void ErrorHandler::movePlayerErrorCheck(const coordinates &move, 
                                       const coordinates &cur, 
                                       const coordinates &other,
@@ -16,7 +25,7 @@ void ErrorHandler::movePlayerErrorCheck(const coordinates &move,
     const int difY = curY - y;
 
     // Out of bounds
-    if (x > 17 || y > 17 || x < 0 || y < 0) {
+    if (x >= 17 || y >= 17 || x < 0 || y < 0) {
         throw std::invalid_argument(
             "Oof, someone's trying to escape\nNot gonna happen"
         );
@@ -201,14 +210,16 @@ void ErrorHandler::placeWallErrorCheck(const coordinates &move, Direction direct
     const int y = move.y;
 
     // Player has no walls
-    if (cur.getWallsCounter() == 0) {
+    if (cur.getWallsCounter() <= 0) {
         throw std::invalid_argument(
             "Sorry, Pal, looks like you're short on walls"
         );
     }
 
+    // TODO: Someone standing there
+
     // Wall out of bounds
-    if (x > 17 || y > 17 || x < 0 || y < 0) {
+    if (x >= 17 || y >= 17 || x < 0 || y < 0) {
         throw std::invalid_argument(
             "What's the point if you can't use it?"
         );
@@ -283,7 +294,7 @@ void ErrorHandler::placeWallErrorCheck(const coordinates &move, Direction direct
 
 // BFS on grid
 // Checks if there is a path from left upper angle to other side of board
-int ErrorHandler::isPathExists(Board boardCopy, const int x, const int y, Direction direction) {
+bool ErrorHandler::isPathExists(Board boardCopy, const int x, const int y, Direction direction) {
 
     switch (direction) {
     case horizontal:
@@ -404,9 +415,9 @@ int ErrorHandler::isPathExists(Board boardCopy, const int x, const int y, Direct
         }
     }
 
-    if (reachedEnd) return moveCount;
+    if (reachedEnd) return true;
 
-    return 0;
+    return false;
 }
 
 // A kludge to add move in case player can jump over another

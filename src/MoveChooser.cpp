@@ -1,0 +1,329 @@
+#include "MoveChooser.h"
+
+coordinates MoveChooser::decideMove(Board board, GreatBoard &gb, Bot bot, Player player) {
+    this->gb = gb;
+    this->bot = bot;
+    this->board = board;
+    this->player = player;
+
+    coordinates move = {0, 0};
+    coordinates best = {0, 0};
+    minimax(move, best, 10, true, -1000, 1000);
+
+    return best;
+}
+
+int MoveChooser::minimax(coordinates &move, coordinates &best, int depth, 
+                         bool maximizingPlayer, int alpha, int beta) {
+
+    if (depth <= 0 || checkWinCondition()) {
+        return heuristic(move, !maximizingPlayer);
+    }
+
+    coordinates botCoord = bot.getPosition();
+    coordinates playerCoord = player.getPosition();
+
+
+    // ? Why calculate walls if they may not be used ?
+    // ? Why go left or right if there is no wall ahead ?
+    std::vector<coordinates> moves, walls;
+    if (maximizingPlayer) {
+        moves = gb.calculatePossibleMoves(botCoord, playerCoord, board);
+        walls = gb.calculateMeaningfulWalls(player, board, 2);
+    } else {
+        moves = gb.calculatePossibleMoves(playerCoord, botCoord, board);
+        walls = gb.calculateMeaningfulWalls(bot, board, 2);
+    }
+
+    std::vector<coordinates> allPossibleMoves;
+    allPossibleMoves.reserve(moves.size() + walls.size()); // preallocate memory
+    allPossibleMoves.insert(allPossibleMoves.end(), moves.begin(), moves.end());
+    allPossibleMoves.insert(allPossibleMoves.end(), walls.begin(), walls.end());
+
+    int score = 0;
+    
+    if (maximizingPlayer) {
+        for (auto move : allPossibleMoves) {
+            makeTurn(move.x, move.y, bot, moves);
+            //drawMap(board, maximizingPlayer, move);
+            score = minimax(move, best, --depth, !maximizingPlayer, alpha, beta);
+
+            // Return values
+            bot.move(botCoord.x, botCoord.y);
+            if (move.x % 2 != 0 || move.y % 2 != 0) { 
+                freeWall(move.x, move.y, bot);
+            }
+
+            if (score > alpha) {
+                best.x = move.x;
+                best.y = move.y;
+                alpha = score;
+            }
+            if (alpha >= beta) { break; }
+        }
+
+        return alpha;
+    } else {
+        for (auto move : allPossibleMoves) {
+            makeTurn(move.x, move.y, player, moves);
+
+            score = minimax(move, best, --depth, !maximizingPlayer, alpha, beta);
+
+            // Return values
+            player.move(playerCoord.x, playerCoord.y);
+            if (move.x % 2 != 0 || move.y % 2 != 0) { 
+                freeWall(move.x, move.y, player);
+            }
+
+            if (score < beta) {
+                // ? Do i need it here?
+                //best.x = move.x;
+                //best.y = move.y;
+                beta = score;
+            }
+            if (alpha >= beta) { break; }
+        }
+
+        return beta;
+    }
+}
+
+int MoveChooser::heuristic(coordinates &move, bool maximizingPlayer) {
+    int score = 0;
+    int x = move.x;
+    int y = move.y;
+
+    if (x % 2 == 0 && y % 2 == 0) {
+        if (maximizingPlayer) { freeWall(x, y, bot); }
+        else                  { freeWall(x, y, player); }
+    }
+
+    int distance = shortestPathToRow(bot, bot.getEndY());
+    int distance2 = shortestPathToRow(player, player.getEndY());
+
+    // If that's a changing position move
+    // Or opponent have path longer than current player
+    // Then there is no need to place a wall
+    if ((x % 2 == 0 && y % 2 == 0) 
+        || (maximizingPlayer && (distance < distance2)) 
+        || (!maximizingPlayer && (distance > distance2))) {
+            score = distance2 - distance;
+            return score;
+    } else {
+        if (maximizingPlayer) { placeWall(x, y, bot); }
+        else                  { placeWall(x, y, player); }
+    }
+
+    // Recalculate shortest path for opponent
+    int distanceAfterWall = (maximizingPlayer)      ? 
+        shortestPathToRow(player, player.getEndY()) :
+        shortestPathToRow(bot, bot.getEndY());
+
+    // Was this wall helpful?
+    if (maximizingPlayer) {
+        score = (distanceAfterWall > distance2) ? 100 : -100;
+    } else {
+        score = (distanceAfterWall > distance) ? 100 : -100;
+    }
+
+    return score;
+}
+
+bool MoveChooser::checkWinCondition() {
+    coordinates coordBot, coordPlayer;
+    coordBot = bot.getPosition();
+    coordPlayer = player.getPosition();
+
+    if      (coordBot.y == bot.getEndY()) { return true; }
+    else if (coordPlayer.y == player.getEndY()) { return true; }
+
+    return false;
+}
+
+int MoveChooser::shortestPathToRow(IPlayer &player, const int endCol) {
+    
+    // Row Queue and Column Queue
+    std::queue<int> rq, cq;
+
+    // Player position as starting node
+    coordinates coordP = player.getPosition();
+    int sr = coordP.x;
+    int sc = coordP.y;
+
+    // Variables used to track the number of steps taken.
+    int moveCount = 0;
+    int nodesLeftInLayer = 1;
+    int nodesInNextLayer = 0;
+
+    // Variable used to track whether the end ever gets reached
+    bool reachedEnd = false;
+
+    bool visited[mapSize][mapSize];
+    for (int i = 0; i < mapSize; i++) {
+        for (int j = 0; j < mapSize; j++) {
+            visited[i][j] = false;
+        }
+    }
+
+    // Define the direction vectors for
+    // north, south, east and west.
+    //   ↑      ↓     →        ←
+    int dr[4] = {-2, +2, 0, 0};
+    int dc[4] = {0, 0, +2, -2};
+
+    // Current position
+    int r = 0;
+    int c = 0;
+
+    rq.push(sr);
+    cq.push(sc);
+    visited[sr][sc] = true;
+
+    while (rq.size() > 0) {
+        r = rq.front();
+        c = cq.front();
+        rq.pop();
+        cq.pop();
+
+        if (c == endCol) {
+            reachedEnd = true;
+            break;
+        }
+
+        int rr, cc;
+        for (int i = 0; i < 4; i++) {
+            rr = r + dr[i];
+            cc = c + dc[i];
+
+            // Skip out of bounds locations
+            if (rr < 0 || cc < 0)
+                continue;
+            if (rr >= mapSize || cc >= mapSize)
+                continue;
+
+            // Skip visited locations or walls
+            if (visited[rr][cc])
+                continue;
+            
+            int difX = r - rr;
+            int difY = cc - c;
+
+            if (difY > 0) {
+                if (board.getTile(rr, cc-1) == wall) {
+                    continue;
+                }
+            }
+            else if (difY < 0) {
+                if (board.getTile(rr, cc+1) == wall) {
+                    continue;
+                }
+            }
+            else if (difX > 0) {
+                if (board.getTile(rr+1, cc) == wall) {
+                    continue;
+                }
+            }
+            else if (difX < 0) {
+                if (board.getTile(rr-1, cc) == wall) {
+                    continue;
+                }
+            }
+            
+            rq.push(rr);
+            cq.push(cc);
+
+            visited[rr][cc] = true;
+            ++nodesInNextLayer;
+        }
+
+        --nodesLeftInLayer;
+        if (nodesLeftInLayer == 0) {
+            nodesLeftInLayer = nodesInNextLayer;
+            nodesInNextLayer = 0;
+            ++moveCount;
+        }
+    }
+
+    if (reachedEnd) return moveCount;
+
+    return 0;
+}
+
+void MoveChooser::makeTurn(const int x, const int y, IPlayer &player, std::vector<coordinates> moves) {
+    // * Build a wall or move
+    if (x % 2 != 0 || y % 2 != 0) {
+        placeWall(x, y, player);
+    } else {
+        gb.movePlayer(x, y, player, board, moves);
+    }
+}
+
+void MoveChooser::placeWall(const int x, const int y, IPlayer &player) {
+    if (x % 2 == 0 && y % 2 != 0) {
+        gb.placeWall(x, y, horizontal, player, board);
+    } else if (x % 2 != 0 && y % 2 == 0) {
+        gb.placeWall(x, y, vertical, player, board);
+    }
+}
+
+void MoveChooser::freeWall(const int x, const int y, IPlayer &player) {
+    if (x % 2 == 0 && y % 2 != 0) {
+        gb.freeWall(x, y, horizontal, player, board);
+    } else if (x % 2 != 0 && y % 2 == 0) {
+        gb.freeWall(x, y, vertical, player, board);
+    }
+}
+
+void MoveChooser::drawMap(Board board, bool maximizingPlayer, coordinates move) {
+    coordinates coordF = bot.getPosition();
+    coordinates coordS = player.getPosition();
+    int x1 = coordF.x;
+    int y1 = coordF.y;
+    int x2 = coordS.x;
+    int y2 = coordS.y;
+
+    char top[17] = {'A', 'S', 'B', 'T', 'C', 'U', 'D', 'V', 'E', 'W', 'F', 'X', 'G', 'Y', 'H', 'Z', 'I'};
+    char cells[9] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'};
+
+    std::cout << "    ";
+    for (int i = 0; i < mapSize; i++) {
+        std::cout << top[i] << ' ';
+    }
+    std::cout << std::endl;
+    
+    std::cout << "    ";
+    for (int i = 0; i < mapSize; i++) {
+        std::cout << '-' << ' ';
+    }
+    std::cout << std::endl;
+
+    for (int i = 0; i < mapSize; i++) {
+        if (i % 2 == 0)
+        std::cout << i/2 + 1 << ' ' << '|' << ' ';
+        else if (i % 2 == 1) 
+        std::cout << i/2 + 1 << 'w' << '|' << ' ';
+
+            for (int j = 0; j < mapSize; j++) {
+                if (x1 == j && y1 == i) {
+                    std::cout << 'W' << ' ';
+                } else if (x2 == j && y2 == i) {
+                    std::cout << 'B' << ' ';
+                } else {
+                    int c = board.getTile(j, i);
+                    if (c == 0) std::cout << ' ';
+                    else if (c == 1) std::cout << '.';
+                    else if (c == 2) std::cout << '#';
+                    std::cout << ' ';
+                }
+            }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+
+    std::string name = (maximizingPlayer) ? "Bot" : "Player";
+    std::cout << name << " Move is: ";
+    std::cout << cells[move.x/2] << ' ' << move.y/2 + 1 << ' ';
+
+    std::cout << std::endl;
+    std::cout << std::endl;
+}

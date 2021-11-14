@@ -5,6 +5,8 @@
 #include "Observer.h"
 #include "utility.h"
 
+#include <iostream>
+
 class View : public Observer {
 private:
     Game *m_model;

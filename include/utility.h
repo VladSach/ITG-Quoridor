@@ -3,6 +3,18 @@
 
 enum {
     WallsAmount = 10,
+    mapSize = 17
+};
+
+enum Field {
+    empty = 0,
+    tile  = 1,
+    wall  = 2
+};
+
+enum Direction {
+    horizontal = 0,
+    vertical
 };
 
 struct coordinates {

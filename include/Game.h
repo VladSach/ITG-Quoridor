@@ -1,22 +1,21 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "Bot.h"
 #include "Board.h"
 #include "Player.h"
-#include "Bot.h"
-#include "Observer.h"
-#include "ErrorHandler.h"
-#include "GreatBoard.h"
 #include "utility.h"
-
-#include <iostream>
+#include "Observer.h"
+#include "GreatBoard.h"
+#include "MoveChooser.h"
+#include "ErrorHandler.h"
 
 // TODO: One day rename board to map and greatBoard to board
 class Game : public Observable {
 private:
     Board board;
     GreatBoard greatBoard;
-    ErrorHandler checker;
+    MoveChooser chooser;
 
     IPlayer &firstPlayer;
     IPlayer &secondPlayer;
@@ -34,8 +33,6 @@ public:
     bool checkGameEnd();
     void switchCurrentPlayer();
     
-    std::vector<coordinates> calculateMeaningfulWalls(IPlayer &player);
-
     void decideTurn();
     void makeTurn(const int x, const int y);
     void movePlayer(const int x, const int y);
@@ -49,29 +46,18 @@ public:
 
     bool getCurrentPlayerNeedsInput();
 
+    int getFirstPlayerWalls();
+    int getSecondPlayerWalls();
+
     coordinates getFirstPlayerPosition();
     coordinates getSecondPlayerPosition();
     coordinates getCurrentPlayerPosition();
     coordinates getOtherPlayerPosition();
 
-    int getFirstPlayerWalls();
-    int getSecondPlayerWalls();
-
     const char *getFirstPlayerName();
     const char *getSecondPlayerName();
     const char *getCurrentPlayerName();
     const char *getWinnerName();
-
-    // Minimax algo
-    // TODO: separate class
-    coordinates decideMovePosition();
-    int minimax(coordinates &move, coordinates &action, int depth, bool maximizationPlayer, int alpha, int beta);
-    
-    int shortestPathToRow(IPlayer &player, const int endRow);
-
-    int heuristic(coordinates &move);
-    int heuristicMove();
-    int heuristicWall();
 };
 
 #endif // GAME_H

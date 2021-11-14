@@ -4,6 +4,8 @@ Player::Player(const int x, const int y, const char* name) {
     m_X = x;
     m_Y = y;
     m_Name = name;
+
+    m_EndY = (y == 0) ? mapSize-1 : 0;
 }
 
 void Player::move(const int x, const int y) { 
@@ -13,6 +15,10 @@ void Player::move(const int x, const int y) {
 
 void Player::reduceWall() {
     --m_WallsCounter;
+}
+
+void Player::returnWall() {
+    ++m_WallsCounter;
 }
 
 bool Player::needsToTakeInput() {
@@ -29,4 +35,8 @@ coordinates Player::getPosition() const {
 
 int Player::getWallsCounter() const {
     return m_WallsCounter;
+}
+
+int Player::getEndY() const {
+    return m_EndY;
 }
