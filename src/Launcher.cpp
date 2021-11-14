@@ -5,7 +5,7 @@ Launcher::Launcher(){}
 
 
 void Launcher::start(){
-	std::cout << "What collor you want to play? white/black" << std::endl;
+	std::cout << "What colour you want to play? white/black" << std::endl;
     std::string answer;
     std::cin >> answer;
 

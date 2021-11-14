@@ -36,8 +36,9 @@ public:
                                  const Board &board);
 
     void placeWallErrorCheck(const coordinates &move, Direction direction,
-                             IPlayer &cur, const Board &board);
-    bool isPathExists(Board boardCopy, const int x, const int y, Direction direction);
+                             IPlayer &cur, IPlayer &other, const Board &board);
+    bool isPathExists(IPlayer &player, Board boardCopy, 
+                      const int x, const int y, Direction direction);
 
     void addMove(std::vector<coordinates> &moves);
 };

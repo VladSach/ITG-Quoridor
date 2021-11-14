@@ -10,7 +10,31 @@ coordinates MoveChooser::decideMove(Board board, GreatBoard &gb, Bot bot, Player
     coordinates best = {0, 0};
     minimax(move, best, 10, true, -1000, 1000);
 
+    // * Safety major
+    std::vector<coordinates> moves;
+    coordinates botCoord = bot.getPosition();
+    coordinates playerCoord = player.getPosition();
+    moves = gb.calculatePossibleMoves(botCoord, playerCoord, board);
+
+    bool found = false;
+
+    for (auto e : moves) {
+        if (e.x == best.x && e.y == best.y) {
+            found = true;
+        }
+    }
+    if (best.x % 2 != 0 || best.y % 2 != 0) {
+        found = true;
+    }
+
+    if(!found) {
+        move = {0, 0};
+        best = {0, 0};
+        minimax(move, best, 1, true, -1000, 1000);
+    }
+
     return best;
+
 }
 
 int MoveChooser::minimax(coordinates &move, coordinates &best, int depth, 
@@ -23,19 +47,17 @@ int MoveChooser::minimax(coordinates &move, coordinates &best, int depth,
     coordinates botCoord = bot.getPosition();
     coordinates playerCoord = player.getPosition();
 
-
     // ? Why calculate walls if they may not be used ?
     // ? Why go left or right if there is no wall ahead ?
-    std::vector<coordinates> moves, walls;
+    std::vector<coordinates> moves, walls, allPossibleMoves;
     if (maximizingPlayer) {
         moves = gb.calculatePossibleMoves(botCoord, playerCoord, board);
-        walls = gb.calculateMeaningfulWalls(player, board, 2);
+        walls = gb.calculateMeaningfulWalls(player, bot, board, 2);
     } else {
         moves = gb.calculatePossibleMoves(playerCoord, botCoord, board);
-        walls = gb.calculateMeaningfulWalls(bot, board, 2);
+        walls = gb.calculateMeaningfulWalls(bot, player, board, 2);
     }
 
-    std::vector<coordinates> allPossibleMoves;
     allPossibleMoves.reserve(moves.size() + walls.size()); // preallocate memory
     allPossibleMoves.insert(allPossibleMoves.end(), moves.begin(), moves.end());
     allPossibleMoves.insert(allPossibleMoves.end(), walls.begin(), walls.end());
@@ -76,9 +98,6 @@ int MoveChooser::minimax(coordinates &move, coordinates &best, int depth,
             }
 
             if (score < beta) {
-                // ? Do i need it here?
-                //best.x = move.x;
-                //best.y = move.y;
                 beta = score;
             }
             if (alpha >= beta) { break; }
@@ -93,6 +112,7 @@ int MoveChooser::heuristic(coordinates &move, bool maximizingPlayer) {
     int x = move.x;
     int y = move.y;
 
+    // Delete wall so path can be found before and after it placement
     if (x % 2 == 0 && y % 2 == 0) {
         if (maximizingPlayer) { freeWall(x, y, bot); }
         else                  { freeWall(x, y, player); }

@@ -94,8 +94,10 @@ std::vector<coordinates> GreatBoard::calculatePossibleMoves(const coordinates &c
     return possibleMoves;
 }
 
+// Looks for wall around player
 // @param r Radius from player to walls
 std::vector<coordinates> GreatBoard::calculateMeaningfulWalls(IPlayer &cur,
+                                                              IPlayer &other,
                                                               Board board,
                                                               const int r = 2) {
     // Possible walls location
@@ -112,7 +114,7 @@ std::vector<coordinates> GreatBoard::calculateMeaningfulWalls(IPlayer &cur,
     for(int x = coordP.x - r; x <= coordP.x; x+=2) {
         for (int y = coordP.y - 1; y <= coordP.y + 1; y+=2) {
             try {
-                checker->placeWallErrorCheck(coordinates {x, y}, horizontal, cur, board);
+                checker->placeWallErrorCheck(coordinates {x, y}, horizontal, cur, other, board);
             } catch(const std::exception& e) {
                 continue;
             }
@@ -124,7 +126,7 @@ std::vector<coordinates> GreatBoard::calculateMeaningfulWalls(IPlayer &cur,
     for(int y = coordP.y - r; y <= coordP.y; y+=2) {
         for (int x = coordP.x - 1; x <= coordP.x + 1; x+=2) {
             try {
-                checker->placeWallErrorCheck(coordinates {x, y}, vertical, cur, board);
+                checker->placeWallErrorCheck(coordinates {x, y}, vertical, cur, other, board);
             } catch(const std::exception& e) {
                 continue;
             }

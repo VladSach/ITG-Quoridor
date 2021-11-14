@@ -204,7 +204,7 @@ bool ErrorHandler::resolvePlayersEncounter(const coordinates &move,
 }
 
 void ErrorHandler::placeWallErrorCheck(const coordinates &move, Direction direction,
-                                     IPlayer &cur, const Board &board) {
+                                     IPlayer &cur, IPlayer &other, const Board &board) {
 
     const int x = move.x;
     const int y = move.y;
@@ -285,17 +285,18 @@ void ErrorHandler::placeWallErrorCheck(const coordinates &move, Direction direct
     }
 
     // Closes last path to finish
-    if (!isPathExists(board, x, y, direction)) {
-        throw std::invalid_argument(
-            "No path - no winner"
-        );
+    if (!isPathExists(cur, board, x, y, direction) ||
+        !isPathExists(other, board, x, y, direction)) {
+            throw std::invalid_argument(
+                "No path - no winner"
+            );
     }
 }
 
 // BFS on grid
 // Checks if there is a path from left upper angle to other side of board
-bool ErrorHandler::isPathExists(Board boardCopy, const int x, const int y, Direction direction) {
-
+bool ErrorHandler::isPathExists(IPlayer &player, Board boardCopy, 
+                                const int x, const int y, Direction direction) {
     switch (direction) {
     case horizontal:
         boardCopy.placeWall(x, y);
@@ -316,9 +317,12 @@ bool ErrorHandler::isPathExists(Board boardCopy, const int x, const int y, Direc
     // Row Queue and Column Queue
     std::queue<int> rq, cq;
 
-    // Left corner as starting node
-    int sr = 0;
-    int sc = 0;
+    // Player position as starting node
+    int sr, sc;
+    coordinates pc;
+    pc = player.getPosition();
+    sr = pc.x;
+    sc = pc.y;
 
     // Variables used to track the number of steps taken.
     int moveCount = 0;
@@ -355,7 +359,7 @@ bool ErrorHandler::isPathExists(Board boardCopy, const int x, const int y, Direc
         rq.pop();
         cq.pop();
 
-        if (c == mapSize-1) {
+        if (c == player.getEndY()) {
             reachedEnd = true;
             break;
         }

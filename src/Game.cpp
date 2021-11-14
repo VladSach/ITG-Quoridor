@@ -86,10 +86,10 @@ void Game::placeWall(const int x, const int y) {
     ErrorHandler* checker = ErrorHandler::GetInstance();
 
     if (x % 2 == 0 && y % 2 != 0) {
-        checker->placeWallErrorCheck(coordinates {x, y}, horizontal, *currentPlayer, board);
+        checker->placeWallErrorCheck(coordinates {x, y}, horizontal, *currentPlayer, *otherPlayer, board);
         greatBoard.placeWall(x, y, horizontal, *currentPlayer, board);
     } else if (x % 2 != 0 && y % 2 == 0) {
-        checker->placeWallErrorCheck(coordinates {x, y}, vertical, *currentPlayer, board);
+        checker->placeWallErrorCheck(coordinates {x, y}, vertical, *currentPlayer, *otherPlayer, board);
         greatBoard.placeWall(x, y, vertical, *currentPlayer, board);
     }
 }

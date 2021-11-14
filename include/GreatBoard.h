@@ -23,6 +23,7 @@ public:
                                                     Board &board);
 
     std::vector<coordinates> calculateMeaningfulWalls(IPlayer &cur,
+                                                      IPlayer &other,
                                                       Board board,
                                                       const int r);
 
