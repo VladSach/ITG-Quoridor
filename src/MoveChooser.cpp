@@ -15,6 +15,7 @@ coordinates MoveChooser::decideMove(Board board, GreatBoard &gb, Bot bot, Player
     coordinates playerCoord = player.getPosition();
     moves = gb.calculatePossibleMoves(botCoord, playerCoord, board);
 
+    // If bot has no walls just find shortest path
     if (bot.getWallsCounter() == 0) {
         int scoreB = 100;
         unsigned int indexB = 0;
@@ -158,9 +159,9 @@ int MoveChooser::heuristic(coordinates &move, bool maximizingPlayer) {
 
     // Was this wall helpful?
     if (maximizingPlayer) {
-        score = (distanceAfterWall > distance2) ? 100 : -100;
+        score = (distanceAfterWall > distance2) ? 100 : -1000;
     } else {
-        score = (distanceAfterWall > distance) ? 100 : -100;
+        score = (distanceAfterWall > distance) ? 100 : -1000;
     }
 
     return score;
@@ -309,58 +310,4 @@ void MoveChooser::freeWall(const int x, const int y, IPlayer &player) {
     } else if (x % 2 != 0 && y % 2 == 0) {
         gb.freeWall(x, y, vertical, player, board);
     }
-}
-
-void MoveChooser::drawMap(Board board, bool maximizingPlayer, coordinates move) {
-    coordinates coordF = bot.getPosition();
-    coordinates coordS = player.getPosition();
-    int x1 = coordF.x;
-    int y1 = coordF.y;
-    int x2 = coordS.x;
-    int y2 = coordS.y;
-
-    char top[17] = {'A', 'S', 'B', 'T', 'C', 'U', 'D', 'V', 'E', 'W', 'F', 'X', 'G', 'Y', 'H', 'Z', 'I'};
-    char cells[9] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'};
-
-    std::cout << "    ";
-    for (int i = 0; i < mapSize; i++) {
-        std::cout << top[i] << ' ';
-    }
-    std::cout << std::endl;
-    
-    std::cout << "    ";
-    for (int i = 0; i < mapSize; i++) {
-        std::cout << '-' << ' ';
-    }
-    std::cout << std::endl;
-
-    for (int i = 0; i < mapSize; i++) {
-        if (i % 2 == 0)
-        std::cout << i/2 + 1 << ' ' << '|' << ' ';
-        else if (i % 2 == 1) 
-        std::cout << i/2 + 1 << 'w' << '|' << ' ';
-
-            for (int j = 0; j < mapSize; j++) {
-                if (x1 == j && y1 == i) {
-                    std::cout << 'W' << ' ';
-                } else if (x2 == j && y2 == i) {
-                    std::cout << 'B' << ' ';
-                } else {
-                    int c = board.getTile(j, i);
-                    if (c == 0) std::cout << ' ';
-                    else if (c == 1) std::cout << '.';
-                    else if (c == 2) std::cout << '#';
-                    std::cout << ' ';
-                }
-            }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
-
-    std::string name = (maximizingPlayer) ? "Bot" : "Player";
-    std::cout << name << " Move is: ";
-    std::cout << cells[move.x/2] << ' ' << move.y/2 + 1 << ' ';
-
-    std::cout << std::endl;
-    std::cout << std::endl;
 }

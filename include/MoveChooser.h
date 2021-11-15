@@ -34,8 +34,6 @@ public:
     void makeTurn(const int x, const int y, IPlayer &player, std::vector<coordinates> moves);
     void placeWall(const int x, const int y, IPlayer &player);
     void freeWall(const int x, const int y, IPlayer &player);
-
-    void drawMap(Board board, bool maximizingPlayer, coordinates move);
 };
 
 #endif // MOVE_CHOOSER_H

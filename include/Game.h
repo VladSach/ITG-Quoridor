@@ -17,6 +17,8 @@ private:
     GreatBoard greatBoard;
     MoveChooser chooser;
 
+    coordinates lastMove;
+
     IPlayer &firstPlayer;
     IPlayer &secondPlayer;
     IPlayer *currentPlayer = nullptr;
@@ -43,6 +45,7 @@ public:
     // * Getters
     Board getBoard();
     std::vector<coordinates> getPossibleMoves();
+    coordinates getLastMove();
 
     bool getCurrentPlayerNeedsInput();
 

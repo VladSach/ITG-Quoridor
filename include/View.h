@@ -16,9 +16,6 @@ public:
     ~View() = default;
 
     virtual void update();
-
-    // ! Test function
-    // ! Don't use it
 };
 
 #endif // VIEW_H
