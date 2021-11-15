@@ -15,7 +15,7 @@ protected:
     static ErrorHandler* singleton_;
 
 private:
-    coordinates kludge = {1337, 1337};
+    std::vector<coordinates> kludge;
 
 public:
     ErrorHandler(ErrorHandler &other) = delete;

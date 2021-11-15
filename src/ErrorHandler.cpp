@@ -62,8 +62,7 @@ void ErrorHandler::movePlayerErrorCheck(const coordinates &move,
     }
 
     if (checkPlayersEncounter(cur, other) &&
-        resolvePlayersEncounter(move, cur, other, board))
-    {
+        resolvePlayersEncounter(move, cur, other, board)) {
         return;
     }
 
@@ -130,7 +129,7 @@ bool ErrorHandler::resolvePlayersEncounter(const coordinates &move,
     const int otherX = other.x;
     const int otherY = other.y;
 
-    kludge = {1337, 1337};
+    kludge.clear();
 
     // P for players
     const int difPX = otherX - curX;
@@ -143,10 +142,10 @@ bool ErrorHandler::resolvePlayersEncounter(const coordinates &move,
         if (difX != 0 || difY != 4 || difPX != 0) { return false; }
         if (board.getTile(curX, curY - 3) == wall) {
             if (board.getTile(curX + 1, curY - 2) != wall) {
-                kludge = {curX + 2, curY - 2};
+                kludge.push_back(coordinates {curX + 2, curY - 2});
             }
             if (board.getTile(curX - 1, curY - 2) != wall) {
-                kludge = {curX - 2, curY - 2};
+                kludge.push_back(coordinates{curX - 2, curY - 2});
             }
 
             throw std::invalid_argument(
@@ -158,10 +157,10 @@ bool ErrorHandler::resolvePlayersEncounter(const coordinates &move,
         if (difX != 0 || difY != -4 || difPX != 0) { return false; }
         if (board.getTile(curX, curY + 3) == wall) {
             if (board.getTile(curX + 1, curY + 2) != wall) {
-                kludge = {curX + 2, curY + 2};
+                kludge.push_back(coordinates{curX + 2, curY + 2});
             }
             if (board.getTile(curX - 1, curY + 2) != wall) {
-                kludge = {curX - 2, curY + 2};
+                kludge.push_back(coordinates{curX - 2, curY + 2});
             }
 
             throw std::invalid_argument(
@@ -173,10 +172,10 @@ bool ErrorHandler::resolvePlayersEncounter(const coordinates &move,
         if (difX != 4 || difY != 0 || difPY != 0) { return false; }
         if (board.getTile(curX + 3, curY) == wall) {
             if (board.getTile(curX + 2, curY + 1) != wall) {
-                kludge = {curX + 2, curY + 2};
+                kludge.push_back(coordinates{curX + 2, curY + 2});
             }
             if (board.getTile(curX + 2, curY - 1) != wall) {
-                kludge = {curX + 2, curY - 2};
+                kludge.push_back(coordinates{curX + 2, curY - 2});
             }
 
             throw std::invalid_argument(
@@ -188,10 +187,10 @@ bool ErrorHandler::resolvePlayersEncounter(const coordinates &move,
         if (difX != -4 || difY != 0 || difPY != 0) { return false; }
         if (board.getTile(curX - 3, curY) == wall) {
             if (board.getTile(curX - 2, curY + 1) != wall) {
-                kludge = {curX - 2, curY + 2};
+                kludge.push_back(coordinates{curX - 2, curY + 2});
             }
             if (board.getTile(curX - 2, curY - 1) != wall) {
-                kludge = {curX - 2, curY - 2};
+                kludge.push_back(coordinates{curX - 2, curY - 2});
             }
 
             throw std::invalid_argument(
@@ -427,9 +426,9 @@ bool ErrorHandler::isPathExists(IPlayer &player, Board boardCopy,
 // A kludge to add move in case player can jump over another
 // Not cool, but I dont want to rewrite 2 functions cause of this
 void ErrorHandler::addMove(std::vector<coordinates> &moves) {
-    if (kludge.x == 1337) { return; }
+    if (kludge.size() == 0) { return; }
 
-    moves.push_back(kludge);
-
-    kludge = {1337, 1337};
+    for (auto e : kludge) {
+        moves.push_back(e);
+    }
 }

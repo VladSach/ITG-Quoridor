@@ -19,7 +19,6 @@ public:
 
     // ! Test function
     // ! Don't use it
-    void drawMap(Board board);
 };
 
 #endif // VIEW_H

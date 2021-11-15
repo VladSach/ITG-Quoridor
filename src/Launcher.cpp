@@ -5,13 +5,13 @@ Launcher::Launcher(){}
 
 
 void Launcher::start(){
-	std::cout << "What colour you want to play? white/black" << std::endl;
+	// std::cout << "What colour you want to play? white/black" << std::endl;
     std::string answer;
     std::cin >> answer;
 
-    if (answer == "white"){
+    if (answer == "black"){
         singleWhite("white", "black");
-    } else if (answer == "black"){
+    } else if (answer == "white"){
         singleBlack("black", "white");
     }
 }

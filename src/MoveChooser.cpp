@@ -8,13 +8,30 @@ coordinates MoveChooser::decideMove(Board board, GreatBoard &gb, Bot bot, Player
 
     coordinates move = {0, 0};
     coordinates best = {0, 0};
-    minimax(move, best, 10, true, -1000, 1000);
 
     // * Safety major
     std::vector<coordinates> moves;
     coordinates botCoord = bot.getPosition();
     coordinates playerCoord = player.getPosition();
     moves = gb.calculatePossibleMoves(botCoord, playerCoord, board);
+
+    if (bot.getWallsCounter() == 0) {
+        int scoreB = 100;
+        unsigned int indexB = 0;
+        int score = 0;
+        for (size_t i = 0; i < moves.size(); i++) {
+            bot.move(moves[i].x, moves[i].y);
+            score = shortestPathToRow(bot, bot.getEndY());
+            if (score <= scoreB) {
+                scoreB = score;
+                indexB = i;
+            }
+        }
+        best.x = moves[indexB].x;
+        best.y = moves[indexB].y;
+    } else {
+        minimax(move, best, 10, true, -1000, 1000);
+    }
 
     bool found = false;
 

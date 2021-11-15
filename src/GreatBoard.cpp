@@ -83,6 +83,7 @@ std::vector<coordinates> GreatBoard::calculatePossibleMoves(const coordinates &c
                 checker->movePlayerErrorCheck(coordinates {x, y}, cur,
                                              other, board);
             } catch(const std::exception& e) {
+                checker->addMove(possibleMoves);
                 continue;
             }
 
